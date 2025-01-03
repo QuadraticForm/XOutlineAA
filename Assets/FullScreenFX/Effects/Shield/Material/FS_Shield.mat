@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FS_Shield
-  m_Shader: {fileID: -6465566751694194690, guid: 9fbc43a1ec0f82b458955e663ce8d8e6,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 9fbc43a1ec0f82b458955e663ce8d8e6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -51,8 +50,9 @@ Material:
     - _Mask_Noise: 0.34
     - _Mask_Size: 0.52
     - _PulseSpeed: 5
-    - _enabled: 1
+    - _enabled: 0
     m_Colors:
     - _Color: {r: 0, g: 0.77349377, b: 2.4622889, a: 1}
     - _Tiling: {r: 6, g: 4, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
