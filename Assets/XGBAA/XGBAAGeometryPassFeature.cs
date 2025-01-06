@@ -5,9 +5,10 @@ using UnityEngine.Rendering.RenderGraphModule;
 
 public class XGBAAGeometryPassFeature : ScriptableRendererFeature
 {
-	DrawObjectsPass drawObjectsPass;
 	public Material overrideMaterial;
-	public LayerMask layerMask = 0; // Add layer mask
+	public LayerMask layerMask = 0;
+
+	DrawObjectsPass drawObjectsPass;
 
 	public override void Create()
 	{
@@ -47,18 +48,18 @@ public class XGBAAGeometryPassFeature : ScriptableRendererFeature
 			using (var builder = renderGraph.AddRasterRenderPass<PassData>("Redraw objects", out var passData))
 			{
 				// Get the data needed to create the list of objects to draw
-				UniversalRenderingData renderingData = frameContext.Get<UniversalRenderingData>();
-				UniversalCameraData cameraData = frameContext.Get<UniversalCameraData>();
-				UniversalLightData lightData = frameContext.Get<UniversalLightData>();
-				SortingCriteria sortFlags = cameraData.defaultOpaqueSortFlags;
-				RenderQueueRange renderQueueRange = RenderQueueRange.opaque;
-				FilteringSettings filterSettings = new FilteringSettings(renderQueueRange, layerMask); // Use layer mask
+				var renderingData = frameContext.Get<UniversalRenderingData>();
+				var cameraData = frameContext.Get<UniversalCameraData>();
+				var lightData = frameContext.Get<UniversalLightData>();
+				var sortFlags = cameraData.defaultOpaqueSortFlags;
+				var renderQueueRange = RenderQueueRange.opaque;
+				var filterSettings = new FilteringSettings(renderQueueRange, layerMask); // Use layer mask
 
 				// Redraw only objects that have their LightMode tag set to UniversalForward 
-				ShaderTagId shadersToOverride = new ShaderTagId("UniversalForward");
+				var shadersToOverride = new ShaderTagId("UniversalForward");
 
 				// Create drawing settings
-				DrawingSettings drawSettings = RenderingUtils.CreateDrawingSettings(shadersToOverride, renderingData, cameraData, lightData, sortFlags);
+				var drawSettings = RenderingUtils.CreateDrawingSettings(shadersToOverride, renderingData, cameraData, lightData, sortFlags);
 
 				// Add the override material to the drawing settings
 				drawSettings.overrideMaterial = materialToUse;
@@ -70,7 +71,7 @@ public class XGBAAGeometryPassFeature : ScriptableRendererFeature
 				passData.rendererListHandle = renderGraph.CreateRendererList(rendererListParameters);
 
 				// Set the render target as the color and depth textures of the active camera texture
-				UniversalResourceData resourceData = frameContext.Get<UniversalResourceData>();
+				var resourceData = frameContext.Get<UniversalResourceData>();
 				builder.UseRendererList(passData.rendererListHandle);
 				builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
 				builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture, AccessFlags.Write);

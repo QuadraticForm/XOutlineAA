@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: XGBAAGeometryPassFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+  overrideMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
   layerMask:
     serializedVersion: 2
     m_Bits: 1
-  overrideMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
