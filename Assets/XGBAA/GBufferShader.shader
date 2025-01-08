@@ -1,4 +1,4 @@
-Shader "XGBAA/GBufferMaterial"
+Shader "XGBAA/GBuffer"
 {
     Properties
     {
@@ -39,10 +39,17 @@ Shader "XGBAA/GBufferMaterial"
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
 
-                // noperspective float4 dists : Dist;
-				noperspective float2 distVec0 : DIST_VEC_0; // distance to edge 0, the opposite edge of vertex 0
-				noperspective float2 distVec1 : DIST_VEC_1; // distance to edge 1, the opposite edge of vertex 1
-				noperspective float2 distVec2 : DIST_VEC_2; // distance to edge 2, the opposite edge of vertex 2
+				// 下面是从当前像素到给定边的轴向距离
+                // 边0是顶点0的对边，依此类推
+                // 轴向距离是从当前像素到边沿x和y轴的距离
+				//
+                // below are the axial distance from current pixel to given edge
+                // edge 0 is the opposite edge of vertex 0, and so on
+                // axial distance is the distance from current pixel to the edge along x and y axes separately
+				//
+				noperspective float2 distVec0 : DIST_VEC_0;
+				noperspective float2 distVec1 : DIST_VEC_1;
+				noperspective float2 distVec2 : DIST_VEC_2;
             };
 
             // constants
@@ -61,8 +68,9 @@ Shader "XGBAA/GBufferMaterial"
                 return o;
             }
 
+			// 从 P 到线段{l0, l1}的最近点的向量
 			// delta vector from p to its closest point on line{l0, l1}
-			float2 CalcDistVec(const float2 l0, const float2 l1, const float2 p)
+			float2 DeltaVec(const float2 l0, const float2 l1, const float2 p)
             {
                 float2 lineVec = l1 - l0;
                 float2 lineDir = normalize(lineVec);
@@ -74,6 +82,37 @@ Shader "XGBAA/GBufferMaterial"
                 // vector from p to its closest point on line
                 return projPoint - p;
             }
+
+            // 计算点 p 到线段 {l0, l1} 在 x 和 y 轴上的距离
+            // 注意：这不是点 p 到线段最近点在 x 和 y 轴上的投影距离，而是分别在 x 和 y 轴上的距离
+            // Calculate the distance from point p to the line segment {l0, l1} along the x and y axes separately
+            // Note: This is not the distance from p to the closest point on the line segment projected onto the x and y axes,
+            // but the distance from p to the line segment along the x and y axes separately
+			float2 AxialDistVec(const float2 l0, const float2 l1, const float2 p)
+			{
+				float2 deltaVec = DeltaVec(l0, l1, p);
+				
+
+				// float deltaVecLen = length(deltaVec);
+				float deltaVecLen2 = dot(deltaVec, deltaVec);
+
+				float2 axialDistVec;
+
+				// 根据相似三角形定理，可以得到下面的等式
+				// according to the similar triangle theorem, we can get the following equation:
+				//
+				// axialDistVec.y / deltaVecLen = deltaVecLen / deltaVec.y
+				// axialDistVec.y = deltaVecLen^2 / deltaVec.y
+				//
+				// same for x axis:
+				// axialDistVec.x = deltaVecLen^2 / deltaVec.x
+
+				float2 safeDeltaVec = sign(deltaVec) * max(abs(deltaVec), 0.00001);
+
+				axialDistVec = deltaVecLen2 / safeDeltaVec;
+
+				return axialDistVec;
+			}
 
 
 
@@ -101,11 +140,11 @@ Shader "XGBAA/GBufferMaterial"
                 float2 pos1 = (In[1].vertex.xy / In[1].vertex.w) * _ScreenParams.xy;
                 float2 pos2 = (In[2].vertex.xy / In[2].vertex.w) * _ScreenParams.xy;
 
-                // distance between each vertex and its opposite edge (on the major axis)
+                // axial distance between each vertex and its opposite edge
 
-                float2 distVec0 = CalcDistVec(pos1, pos2, pos0);
-                float2 distVec1 = CalcDistVec(pos2, pos0, pos1);
-                float2 distVec2 = CalcDistVec(pos0, pos1, pos2);
+                float2 distVec0 = AxialDistVec(pos1, pos2, pos0);
+                float2 distVec1 = AxialDistVec(pos2, pos0, pos1);
+                float2 distVec2 = AxialDistVec(pos0, pos1, pos2);
 
                 Stream.Append( GsMakeVert(In[0], distVec0, 0, 0) );
                 Stream.Append( GsMakeVert(In[1], 0, distVec1, 0) );
@@ -117,66 +156,33 @@ Shader "XGBAA/GBufferMaterial"
 				fixed4 col = fixed4(0, 0, 0, 1);
 
 				//
-				// debug draw dists
+				// find the closest axial distance
 				//
-				/*
-				col.x = length(i.distVec0 / _ScreenParams.xy);
-				col.y = length(i.distVec1 / _ScreenParams.xy);
-				col.z = length(i.distVec2 / _ScreenParams.xy);
-				return col;
-				*/
 
-				// pick the closest edge
+				// find the closest axial distance separately on x and y axes
 
-				float dist0 = length(i.distVec0);
-				float dist1 = length(i.distVec1);
-				float dist2 = length(i.distVec2);
+                float2 distVec = i.distVec0;
 
-				float dist = dist0;
-				float2 distVec = i.distVec0;
+                float2 absDistVec1 = abs(i.distVec1);
+                float2 absDistVec2 = abs(i.distVec2);
 
-				if (dist1 < dist)
-				{
-					distVec = i.distVec1;
-					dist = dist1;
-				}
+                distVec.x = (absDistVec1.x < abs(distVec.x)) ? i.distVec1.x : distVec.x;
+                distVec.x = (absDistVec2.x < abs(distVec.x)) ? i.distVec2.x : distVec.x;
 
-				if (dist2 < dist)
-				{
-					distVec = i.distVec2;
-				}
+                distVec.y = (absDistVec1.y < abs(distVec.y)) ? i.distVec1.y : distVec.y;
+                distVec.y = (absDistVec2.y < abs(distVec.y)) ? i.distVec2.y : distVec.y;
 
-				// debug draw
-				// col.xy = abs(distVec) / _ScreenParams.xy; // normalize to [0, 1]
+				// pick the smaller axis
 
-				float major_dist = 0;
+				distVec *= abs(distVec.x) < abs(distVec.y) ? float2(1, 0) : float2(0, 1);
 
-				// pick the major axis
-				if (abs(distVec.x) > abs(distVec.y))
-				{
-					distVec.y = 0;
+				//
+				// output
+				//
 
-					major_dist = distVec.x;
+				col.rg = distVec; // direct output to a signed rg Texture
 
-					col.xy = float2(1,0); // debug color
-				}
-				else
-				{
-					distVec.x = 0;
-
-					major_dist = distVec.y;
-
-					col.xy = float2(0,1); // debug color
-				}
-
-				// col.xy = abs(distVec); // debug color
-				
-				// debug draw
-
-				if (abs(major_dist) > 1)
-				{
-					col.xy = 0;
-				}
+				// col.rg = abs(distVec); // debug draw
 
 				return col;
             }

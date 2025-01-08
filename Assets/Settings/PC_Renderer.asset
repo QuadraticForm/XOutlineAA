@@ -72,8 +72,9 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 1
-  resolveMaterial: {fileID: 2100000, guid: 4bedb6f9b66036344b3075ff3620d690, type: 2}
-  debugShowGBuffer: 0
+  resolveMaterial: {fileID: -876546973899608171, guid: fa7b55591d39c6345bb256a025d4dd3b, type: 3}
+  debugMaterial: {fileID: -876546973899608171, guid: fa7715b0e0261c5488d1111257d9a772, type: 3}
+  debugGBufferAlpha: 0.019
 --- !u!114 &3352598969274636748
 MonoBehaviour:
   m_ObjectHideFlags: 0
