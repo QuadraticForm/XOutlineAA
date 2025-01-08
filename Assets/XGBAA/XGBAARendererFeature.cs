@@ -10,37 +10,44 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	public Material gbufferMaterial;
 	public LayerMask layerMask = 0;
+	
 	XGBAAGBufferPass gbufferPass;
+
+	[Header("Debug Pass")]
+	[Range(0, 1), Tooltip("If alpha == 0, won't do debug")]
+	public float debugGBufferAlpha = 0.0f;
+
+	public Material debugMaterial;
+	
+	XGBAAPostProcessPass debugPass;
 
 	[Header("Resolve Pass")]
 
 	public Material resolveMaterial;
-	XGBAAResolvePass resolvePass;
 
-	[Header("Debug")]
-
-	public Material debugMaterial;
-	[Range(0, 1)]
-	public float debugGBufferAlpha = 0.0f;
+	XGBAAPostProcessPass resolvePass;
 
 	// Shared gbuffer texture
 	private TextureHandle gbuffer = TextureHandle.nullHandle;
 
 	public override void Create()
 	{
-		// Create the render pass that draws the objects, and pass in the override material
 		gbufferPass = new XGBAAGBufferPass(this);
 		gbufferPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
-		// Create the post-processing pass
-		resolvePass = new XGBAAResolvePass(this);
+		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugGBufferAlpha);
+		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+
+		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, 1); // resolve pass's alpha should always be 1
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
 		renderer.EnqueuePass(gbufferPass);
-		renderer.EnqueuePass(resolvePass);
+		if (debugGBufferAlpha > 0.0001f)
+			renderer.EnqueuePass(debugPass);
+		//renderer.EnqueuePass(resolvePass);
 	}
 
 	class XGBAAGBufferPass : ScriptableRenderPass
@@ -99,12 +106,18 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 		static void ExecutePass(PassData data, RasterGraphContext context)
 		{
-			context.cmd.ClearRenderTarget(true, true, Color.black);
+			// Clear with 2
+			// gbuffer stores the pixel-edge distance,
+			// 0 means on the edge, 1 means 1 pixel away from the edge,
+			// 2 is far enough to be used as a default value
+			context.cmd.ClearRenderTarget(true, true, new Color(2,2,2));
+			// context.cmd.ClearRenderTarget(true, true, Color.black);
+
 			context.cmd.DrawRendererList(data.rendererListHandle);
 		}
 	}
 
-	class XGBAAResolvePass : ScriptableRenderPass
+	class XGBAAPostProcessPass : ScriptableRenderPass
 	{
 		private class CopyCameraColorPassData
 		{
@@ -112,7 +125,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			public TextureHandle destination;
 		}
 
-		private class ResolvePassData
+		private class MainPassData
 		{
 			public TextureHandle cameraColorCopy;
 			public TextureHandle gbuffer;
@@ -120,13 +133,17 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			public TextureHandle destination;
 		}
 
+		public Material postProcessMaterial;
+		public float alpha = 1;
 		private XGBAARendererFeature rendererFeature;
 		private MaterialPropertyBlock propertyBlock;
 
-		public XGBAAResolvePass(XGBAARendererFeature rendererFeature)
+		public XGBAAPostProcessPass(XGBAARendererFeature rendererFeature, Material postProcessMaterial, float alpha)
 		{
 			this.rendererFeature = rendererFeature;
 			propertyBlock = new MaterialPropertyBlock();
+			this.postProcessMaterial = postProcessMaterial;
+			this.alpha = alpha;
 		}
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
@@ -161,9 +178,9 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 				});
 			}
 
-			// build render graph for resolve pass
+			// build render graph for post process pass
 
-			using (var builder = renderGraph.AddRasterRenderPass<ResolvePassData>("XGBAA Resolve Pass", out var passData, profilingSampler))
+			using (var builder = renderGraph.AddRasterRenderPass<MainPassData>("XGBAA Post-Process", out var passData, profilingSampler))
 			{
 				passData.cameraColorCopy = cameraColorCopy;
 				passData.gbuffer = rendererFeature.gbuffer;
@@ -173,18 +190,18 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 				builder.UseTexture(passData.gbuffer);
 				builder.SetRenderAttachment(passData.destination, 0);
 
-				builder.SetRenderFunc((ResolvePassData data, RasterGraphContext context) =>
+				builder.SetRenderFunc((MainPassData data, RasterGraphContext context) =>
 				{
 					propertyBlock.SetTexture("_CameraColorCopy", data.cameraColorCopy);
 					propertyBlock.SetTexture("_GBuffer", data.gbuffer);
-					propertyBlock.SetFloat("_DebugGBufferAlpha", rendererFeature.debugGBufferAlpha);
+					propertyBlock.SetFloat("_Alpha", alpha);
 
-					var material = rendererFeature.debugGBufferAlpha > 0.01f ? rendererFeature.debugMaterial : rendererFeature.resolveMaterial;
+					// var material = rendererFeature.debugGBufferAlpha > 0.01f ? rendererFeature.debugMaterial : rendererFeature.resolveMaterial;
 
 					// copied form Unity URP's FullScreenPassRendererFeature.cs
 					// it seems the FullScreen Shader Graph determines the vertex position based on vertex index
 					// and it made this triangle large enough to cover the whole screen
-					context.cmd.DrawProcedural(Matrix4x4.identity, material, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
+					context.cmd.DrawProcedural(Matrix4x4.identity, postProcessMaterial, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
 				});
 			}
 		}

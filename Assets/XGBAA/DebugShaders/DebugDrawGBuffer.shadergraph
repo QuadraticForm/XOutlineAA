@@ -165,7 +165,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "0f04b3e1df9b4acb88289116a46a4314",
     "m_Id": 0,
-    "m_DisplayName": "DebugGBufferAlpha",
+    "m_DisplayName": "Alpha",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -207,10 +207,10 @@
     "m_Guid": {
         "m_GuidSerialized": "ef8d0479-b946-4b9a-bfc2-d7b9b4eb9076"
     },
-    "m_Name": "DebugGBufferAlpha",
+    "m_Name": "Alpha",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "DebugGBufferAlpha",
-    "m_DefaultReferenceName": "_DebugGBufferAlpha",
+    "m_RefNameGeneratedByDisplayName": "Alpha",
+    "m_DefaultReferenceName": "_Alpha",
     "m_OverrideReferenceName": "",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
