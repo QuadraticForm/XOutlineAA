@@ -84,7 +84,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 				var textureProperties = cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
-				textureProperties.colorFormat = RenderTextureFormat.RGHalf;
+				textureProperties.colorFormat = RenderTextureFormat.RGFloat;
 				rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XGBAA GBuffer", false);
 
 				// actual build render graph

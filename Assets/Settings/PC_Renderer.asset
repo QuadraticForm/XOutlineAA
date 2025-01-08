@@ -73,8 +73,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   resolveMaterial: {fileID: -876546973899608171, guid: fa7b55591d39c6345bb256a025d4dd3b, type: 3}
-  debugMaterial: {fileID: -876546973899608171, guid: fa7715b0e0261c5488d1111257d9a772, type: 3}
-  debugGBufferAlpha: 0.019
+  debugMaterial: {fileID: -876546973899608171, guid: 2f4566a92476c5448aef8df46e52d7ed, type: 3}
+  debugGBufferAlpha: 1
 --- !u!114 &3352598969274636748
 MonoBehaviour:
   m_ObjectHideFlags: 0

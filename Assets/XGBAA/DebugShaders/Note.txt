@@ -1,0 +1,17 @@
+﻿HOW TO USE:
+
+1. For each shader graph, there is a embedded material in it, 
+   click the small triangle on the left to see it;
+
+2. Assign embeded material to the XGBAARendererFeature's "Debug Material" 
+   and change its alpha to non-zero;
+
+3. Different shader can show different debug info;
+
+如何使用：
+
+1. 对于每个Shader Graph，都有一个内置的材质，点击左侧的小三角形即可查看；
+
+2. 将内置材质赋值给 XGBAARendererFeature 的 Debug Material，并将 alpha 值改为非零；
+
+3. 不同的Shader可以显示不同的调试信息；

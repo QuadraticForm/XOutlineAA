@@ -107,7 +107,7 @@ Shader "XGBAA/GBuffer"
 				// same for x axis:
 				// axialDistVec.x = deltaVecLen^2 / deltaVec.x
 
-				float2 safeDeltaVec = sign(deltaVec) * max(abs(deltaVec), 0.00001);
+				float2 safeDeltaVec = sign(deltaVec) * max(abs(deltaVec), 0.000001);
 
 				axialDistVec = deltaVecLen2 / safeDeltaVec;
 
@@ -133,12 +133,16 @@ Shader "XGBAA/GBuffer"
 			[maxvertexcount(3)]
             void geom(triangle GsIn In[3], inout TriangleStream<PsIn> Stream)
             {
-                // get the screen space position of the triangle vertices
-                // perspective divide, get the NDC position, and then scale screen space
+                // now we have the vertices in clip space, we need to
+                // perspective divide, get the NDC position, and then scale to screen space
 
-                float2 pos0 = (In[0].vertex.xy / In[0].vertex.w) * _ScreenParams.xy;
-                float2 pos1 = (In[1].vertex.xy / In[1].vertex.w) * _ScreenParams.xy;
-                float2 pos2 = (In[2].vertex.xy / In[2].vertex.w) * _ScreenParams.xy;
+				float2 halfScreenSize = _ScreenParams.xy * 0.5f; 
+				// by multiplying halfScreenSize, we can scale distance from NDC to screen space
+				// why half? because NDC's range is [-1, 1], that is 2 units in total
+
+                float2 pos0 = (In[0].vertex.xy / In[0].vertex.w) * halfScreenSize;
+                float2 pos1 = (In[1].vertex.xy / In[1].vertex.w) * halfScreenSize;
+                float2 pos2 = (In[2].vertex.xy / In[2].vertex.w) * halfScreenSize;
 
                 // axial distance between each vertex and its opposite edge
 
@@ -172,17 +176,20 @@ Shader "XGBAA/GBuffer"
                 distVec.y = (absDistVec1.y < abs(distVec.y)) ? i.distVec1.y : distVec.y;
                 distVec.y = (absDistVec2.y < abs(distVec.y)) ? i.distVec2.y : distVec.y;
 
-				// pick the smaller axis
+				// TEST pick the smaller axis, and fill 0 to the other axis
+				// distVec = abs(distVec.x) < abs(distVec.y) ? float2(distVec.x, 0) : float2(0, distVec.y);
 
-				distVec *= abs(distVec.x) < abs(distVec.y) ? float2(1, 0) : float2(0, 1);
+				// TEST pick the samller axis, and fill 1 to the other axis
+				// distVec = abs(distVec.x) < abs(distVec.y) ? float2(distVec.x, 1) : float2(1, distVec.y);
+
+				// TEST
+				// col.rg = abs(distVec); // debug draw
 
 				//
 				// output
 				//
 
-				col.rg = distVec; // direct output to a signed rg Texture
-
-				// col.rg = abs(distVec); // debug draw
+				col.rg = distVec; // direct output, no packing, so MUST output to a signed rg Texture
 
 				return col;
             }
