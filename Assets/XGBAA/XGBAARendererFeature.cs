@@ -15,6 +15,8 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 	public List<string> shaderTagNameList = new List<string>
 	{
 		"UniversalForward",
+		"UniversalGBuffer", // this is to ensure shaders like UnlitShaderGraph are included
+							// (which doesn't have a light mode in UniversalForward, but do have a UniversalGBuffer pass)
 	};
 
 	// ShaderTagId list moved to RenderFeature as a field

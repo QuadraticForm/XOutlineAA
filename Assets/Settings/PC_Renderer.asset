@@ -75,9 +75,9 @@ MonoBehaviour:
   shaderTagNameList:
   - UniversalForward
   - UniversalGBuffer
-  debugAlpha: 1
-  debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
-  resolveAlpha: 0
+  debugAlpha: 0
+  debugMaterial: {fileID: -876546973899608171, guid: 3f7aa243b04358e4cbe7c51b54570277, type: 3}
+  resolveAlpha: 1
   resolveMaterial: {fileID: -876546973899608171, guid: e3e651cddd49d1f41a8da049a3fa9557, type: 3}
 --- !u!114 &3352598969274636748
 MonoBehaviour:
