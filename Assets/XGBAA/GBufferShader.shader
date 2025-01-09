@@ -182,15 +182,6 @@ Shader "XGBAA/GBuffer"
                 distVec.y = (absDistVec1.y < abs(distVec.y)) ? i.distVec1.y : distVec.y;
                 distVec.y = (absDistVec2.y < abs(distVec.y)) ? i.distVec2.y : distVec.y;
 
-				// X IMPROVEMENT draw edges only
-
-				float2 absDistVec = abs(distVec);
-
-				if (min(absDistVec.x, absDistVec.y) >= 1)
-				{
-					discard;
-				}
-
 				// X TODO, for degenerate triangles, 
 				// we should output the axial distance to the outter most edge? 
 				// not the closest edge
