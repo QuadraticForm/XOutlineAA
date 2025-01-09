@@ -3,6 +3,8 @@ Shader "XGBAA/GBuffer"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+
+		_Cull("__cull", Float) = 2.0
     }
     SubShader
     {
@@ -11,6 +13,10 @@ Shader "XGBAA/GBuffer"
 
         Pass
         {
+			Tags { "LightMode" = "UniversalForward" }
+
+			Cull [_Cull] // Add this line to allow material overrid
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -184,6 +190,15 @@ Shader "XGBAA/GBuffer"
 
 				// TEST
 				// col.rg = abs(distVec); // debug draw
+
+				// TEST draw edges only
+
+				float2 absDistVec = abs(distVec);
+
+				if (min(absDistVec.x, absDistVec.y) >= 1)
+				{
+					discard;
+				}
 
 				//
 				// output

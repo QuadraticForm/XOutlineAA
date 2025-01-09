@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
@@ -10,18 +11,30 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	public Material gbufferMaterial;
 	public LayerMask layerMask = 0;
-	
+
+	public List<string> shaderTagNameList = new List<string>
+	{
+		"UniversalForward",
+	};
+
+	// ShaderTagId list moved to RenderFeature as a field
+	private List<ShaderTagId> shaderTagIdList;
+
 	XGBAAGBufferPass gbufferPass;
 
 	[Header("Debug Pass")]
-	[Range(0, 1), Tooltip("If alpha == 0, won't do debug")]
-	public float debugGBufferAlpha = 0.0f;
+
+	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
+	public float debugAlpha = 0.0f;
 
 	public Material debugMaterial;
-	
+
 	XGBAAPostProcessPass debugPass;
 
 	[Header("Resolve Pass")]
+
+	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
+	public float resolveAlpha = 1.0f;
 
 	public Material resolveMaterial;
 
@@ -30,24 +43,33 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 	// Shared gbuffer texture
 	private TextureHandle gbuffer = TextureHandle.nullHandle;
 
+	
+
 	public override void Create()
 	{
+		shaderTagIdList = new List<ShaderTagId>();
+		foreach (var passName in shaderTagNameList)
+		{
+			shaderTagIdList.Add(new ShaderTagId(passName));
+		}
+
 		gbufferPass = new XGBAAGBufferPass(this);
 		gbufferPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
-		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugGBufferAlpha);
+		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugAlpha);
 		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 
-		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, 1); // resolve pass's alpha should always be 1
+		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
 		renderer.EnqueuePass(gbufferPass);
-		if (debugGBufferAlpha > 0.0001f)
+		if (debugAlpha > 0.0001f)
 			renderer.EnqueuePass(debugPass);
-		//renderer.EnqueuePass(resolvePass);
+		if (resolveAlpha > 0.0001f)
+			renderer.EnqueuePass(resolvePass);
 	}
 
 	class XGBAAGBufferPass : ScriptableRenderPass
@@ -78,8 +100,8 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 				// create renderer list
 
 				var sortFlags = cameraData.defaultOpaqueSortFlags;
-				var shadersToOverride = new ShaderTagId("UniversalForward");
-				var drawSettings = RenderingUtils.CreateDrawingSettings(shadersToOverride, renderingData, cameraData, lightData, sortFlags);
+				var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
+
 				drawSettings.overrideMaterial = rendererFeature.gbufferMaterial;
 
 				var filterSettings = new FilteringSettings(RenderQueueRange.opaque, rendererFeature.layerMask);
@@ -109,9 +131,11 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			// Clear with 2
 			// gbuffer stores the pixel-edge distance,
 			// 0 means on the edge, 1 means 1 pixel away from the edge,
-			// 2 is far enough to be used as a default value
-			context.cmd.ClearRenderTarget(true, true, new Color(2,2,2));
-			// context.cmd.ClearRenderTarget(true, true, Color.black);
+			// 1 is the maximum value GBufferShader will output,
+			// and all value outside [-1, 1] is disregarded by the resolve pass
+			// so 2 is large enough to be used as a invalid value
+			context.cmd.ClearRenderTarget(false, true, new Color(2, 2, 2));
+			// context.cmd.ClearRenderTarget(false, true, Color.black);
 
 			context.cmd.DrawRendererList(data.rendererListHandle);
 		}

@@ -1345,8 +1345,8 @@
     "m_ObjectId": "5fcbf729f96f4ddb93ae8e44ad5cfcd5",
     "m_Title": "Original Pos",
     "m_Position": {
-        "x": -336.0001220703125,
-        "y": -230.00001525878907
+        "x": -335.99993896484377,
+        "y": -229.99998474121095
     }
 }
 
@@ -1720,7 +1720,7 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": {
-        "m_filter": 0,
+        "m_filter": 1,
         "m_wrap": 1,
         "m_anisotropic": 0
     }
@@ -2216,8 +2216,8 @@
     "m_ObjectId": "d743b2b7db194a92af7c41a1312f7338",
     "m_Title": "YFlip",
     "m_Position": {
-        "x": -756.0000610351563,
-        "y": 331.49993896484377
+        "x": -756.0,
+        "y": 331.5000305175781
     }
 }
 

@@ -72,9 +72,13 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 1
-  debugGBufferAlpha: 1
+  shaderTagNameList:
+  - UniversalForward
+  - UniversalGBuffer
+  debugAlpha: 1
   debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
-  resolveMaterial: {fileID: -876546973899608171, guid: fa7b55591d39c6345bb256a025d4dd3b, type: 3}
+  resolveAlpha: 0
+  resolveMaterial: {fileID: -876546973899608171, guid: e3e651cddd49d1f41a8da049a3fa9557, type: 3}
 --- !u!114 &3352598969274636748
 MonoBehaviour:
   m_ObjectHideFlags: 0
