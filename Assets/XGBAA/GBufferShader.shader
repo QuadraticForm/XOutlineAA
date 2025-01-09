@@ -76,7 +76,7 @@ Shader "XGBAA/GBuffer"
 
 			// 从 P 到线段{l0, l1}的最近点的向量
 			// delta vector from p to its closest point on line{l0, l1}
-			float2 DeltaVec(const float2 l0, const float2 l1, const float2 p)
+			float2 DeltaVec(const float2 p, const float2 l0, const float2 l1)
             {
                 float2 lineVec = l1 - l0;
                 float2 lineDir = normalize(lineVec);
@@ -94,9 +94,9 @@ Shader "XGBAA/GBuffer"
             // Calculate the distance from point p to the line segment {l0, l1} along the x and y axes separately
             // Note: This is not the distance from p to the closest point on the line segment projected onto the x and y axes,
             // but the distance from p to the line segment along the x and y axes separately
-			float2 AxialDistVec(const float2 l0, const float2 l1, const float2 p)
+			float2 AxialDistVec(const float2 p, const float2 l0, const float2 l1)
 			{
-				float2 deltaVec = DeltaVec(l0, l1, p);
+				float2 deltaVec = DeltaVec(p, l0, l1);
 				
 
 				// float deltaVecLen = length(deltaVec);
@@ -152,9 +152,9 @@ Shader "XGBAA/GBuffer"
 
                 // axial distance between each vertex and its opposite edge
 
-                float2 distVec0 = AxialDistVec(pos1, pos2, pos0);
-                float2 distVec1 = AxialDistVec(pos2, pos0, pos1);
-                float2 distVec2 = AxialDistVec(pos0, pos1, pos2);
+                float2 distVec0 = AxialDistVec(pos0, pos1, pos2);
+                float2 distVec1 = AxialDistVec(pos1, pos2, pos0);
+                float2 distVec2 = AxialDistVec(pos2, pos0, pos1);
 
                 Stream.Append( GsMakeVert(In[0], distVec0, 0, 0) );
                 Stream.Append( GsMakeVert(In[1], 0, distVec1, 0) );
@@ -182,16 +182,7 @@ Shader "XGBAA/GBuffer"
                 distVec.y = (absDistVec1.y < abs(distVec.y)) ? i.distVec1.y : distVec.y;
                 distVec.y = (absDistVec2.y < abs(distVec.y)) ? i.distVec2.y : distVec.y;
 
-				// TEST pick the smaller axis, and fill 0 to the other axis
-				// distVec = abs(distVec.x) < abs(distVec.y) ? float2(distVec.x, 0) : float2(0, distVec.y);
-
-				// TEST pick the samller axis, and fill 1 to the other axis
-				// distVec = abs(distVec.x) < abs(distVec.y) ? float2(distVec.x, 1) : float2(1, distVec.y);
-
-				// TEST
-				// col.rg = abs(distVec); // debug draw
-
-				// TEST draw edges only
+				// X IMPROVEMENT draw edges only
 
 				float2 absDistVec = abs(distVec);
 
@@ -199,6 +190,10 @@ Shader "XGBAA/GBuffer"
 				{
 					discard;
 				}
+
+				// X TODO, for degenerate triangles, 
+				// we should output the axial distance to the outter most edge? 
+				// not the closest edge
 
 				//
 				// output
