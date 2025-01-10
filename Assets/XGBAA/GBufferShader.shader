@@ -156,9 +156,42 @@
                 float2 distVec1 = AxialDistVec(pos1, pos2, pos0);
                 float2 distVec2 = AxialDistVec(pos2, pos0, pos1);
 
-                Stream.Append( GsMakeVert(In[0], distVec0, 0, 0) );
-                Stream.Append( GsMakeVert(In[1], 0, distVec1, 0) );
-                Stream.Append( GsMakeVert(In[2], 0, 0, distVec2) );
+				// original
+
+				Stream.Append( GsMakeVert(In[0], distVec0, 0, 0) );
+				Stream.Append( GsMakeVert(In[1], 0, distVec1, 0) );
+				Stream.Append( GsMakeVert(In[2], 0, 0, distVec2) );
+
+				return;
+
+				// TEST sub-pixel triangle
+				/*
+				float minX = min(min(pos0.x, pos1.x), pos2.x);
+				float maxX = max(max(pos0.x, pos1.x), pos2.x);
+
+				float minY = min(min(pos0.y, pos1.y), pos2.y);
+				float maxY = max(max(pos0.y, pos1.y), pos2.y);
+
+				bool isSubP = (maxX - minX < 1 || maxY - minY < 1);
+
+				isSubP = false;
+
+				if (isSubP)
+				{
+					float2 invalid_distVec = float2(2, 2);
+
+					// this is a sub-pixel triangle
+					Stream.Append( GsMakeVert(In[0], invalid_distVec, invalid_distVec, invalid_distVec) );
+					Stream.Append( GsMakeVert(In[1], invalid_distVec, invalid_distVec, invalid_distVec) );
+					Stream.Append( GsMakeVert(In[2], invalid_distVec, invalid_distVec, invalid_distVec) );
+				}
+				else
+				{
+					Stream.Append( GsMakeVert(In[0], distVec0, 0, 0) );
+					Stream.Append( GsMakeVert(In[1], 0, distVec1, 0) );
+					Stream.Append( GsMakeVert(In[2], 0, 0, distVec2) );
+				}
+				*/
             }
 
 			// 像素着色器

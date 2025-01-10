@@ -41,6 +41,20 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	#endregion
 
+	#region Internal Edge Detection(Removal) Pass Fields
+
+	/*
+	[Header("Edge Detection Pass")]
+
+	public bool enableEdgeDetection = false;
+
+	public Material edgeDetectionMaterial;
+
+	private XGBAAEdgeDetectionPass edgeDetectionPass;
+	*/
+
+	#endregion
+
 	#region Resolve Pass Fields
 
 	[Header("Resolve Pass")]
@@ -75,6 +89,11 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugAlpha);
 		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 
+		/*
+		edgeDetectionPass = new XGBAAEdgeDetectionPass(this, edgeDetectionMaterial);
+		edgeDetectionPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
+		*/
+
 		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
@@ -82,8 +101,15 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
 		renderer.EnqueuePass(gbufferPass);
+
 		if (debugAlpha > 0.0001f)
 			renderer.EnqueuePass(debugPass);
+
+		/*
+		if (enableEdgeDetection)
+			renderer.EnqueuePass(edgeDetectionPass);
+		*/
+
 		if (resolveAlpha > 0.0001f)
 			renderer.EnqueuePass(resolvePass);
 	}
@@ -168,6 +194,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 		private class MainPassData
 		{
 			public TextureHandle cameraColorCopy;
+			public TextureHandle cameraDepth;
 			public TextureHandle gbuffer;
 
 			public TextureHandle destination;
@@ -223,16 +250,19 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			using (var builder = renderGraph.AddRasterRenderPass<MainPassData>("XGBAA Post-Process", out var passData, profilingSampler))
 			{
 				passData.cameraColorCopy = cameraColorCopy;
+				passData.cameraDepth = resourcesData.cameraDepthTexture;
 				passData.gbuffer = rendererFeature.gbuffer;
 				passData.destination = resourcesData.activeColorTexture;
 
 				builder.UseTexture(passData.cameraColorCopy);
+				builder.UseTexture(passData.cameraDepth);
 				builder.UseTexture(passData.gbuffer);
 				builder.SetRenderAttachment(passData.destination, 0);
 
 				builder.SetRenderFunc((MainPassData data, RasterGraphContext context) =>
 				{
 					propertyBlock.SetTexture("_CameraColorCopy", data.cameraColorCopy);
+					propertyBlock.SetTexture("_CameraDepthCopy", data.cameraDepth); // "_CameraDepthTexture" is in use by unity, so I just use "_CameraDepthCopy" instead
 					propertyBlock.SetTexture("_GBuffer", data.gbuffer);
 					propertyBlock.SetFloat("_Alpha", alpha);
 
@@ -246,4 +276,56 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			}
 		}
 	}
+
+	/*
+	public class XGBAAEdgeDetectionPass : ScriptableRenderPass
+	{
+		private XGBAARendererFeature rendererFeature;
+		private Material edgeDetectionMaterial;
+		private MaterialPropertyBlock propertyBlock;
+
+		public XGBAAEdgeDetectionPass(XGBAARendererFeature rendererFeature, Material edgeDetectionMaterial)
+		{
+			this.rendererFeature = rendererFeature;
+			this.edgeDetectionMaterial = edgeDetectionMaterial;
+
+			propertyBlock = new MaterialPropertyBlock();
+		}
+
+		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+		{
+			using (var builder = renderGraph.AddRasterRenderPass<PassData>("XGBAA Edge Detection Pass", out var passData))
+			{
+				var resourcesData = frameContext.Get<UniversalResourceData>();
+				var cameraData = frameContext.Get<UniversalCameraData>();
+
+				passData.cameraDepth = resourcesData.cameraDepthTexture;
+				passData.cameraNormals = resourcesData.cameraNormalsTexture;
+				passData.destination = resourcesData.activeColorTexture;
+
+				builder.UseTexture(passData.cameraDepth);
+				builder.UseTexture(passData.cameraNormals);
+				builder.SetRenderAttachment(passData.destination, 0);
+
+				builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+				{
+					var cmd = context.cmd;
+
+					propertyBlock.SetTexture("_CameraDepthTexture", data.cameraDepth);
+					propertyBlock.SetTexture("_CameraNormalsTexture", data.cameraNormals);
+
+					context.cmd.DrawProcedural(Matrix4x4.identity, edgeDetectionMaterial, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
+				});
+			}
+		}
+
+		private class PassData
+		{
+			public TextureHandle cameraDepth;
+			public TextureHandle cameraNormals;
+			public TextureHandle destination;
+		}
+	}
+
+	*/
 }

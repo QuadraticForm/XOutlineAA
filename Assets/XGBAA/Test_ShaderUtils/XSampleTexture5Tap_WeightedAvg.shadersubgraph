@@ -2252,8 +2252,8 @@
     "m_ObjectId": "bf33a25eedaa4019b6dbba2507fd0fa8",
     "m_Title": "1 / WeightSum",
     "m_Position": {
-        "x": -2146.999755859375,
-        "y": -58.00006866455078
+        "x": -2147.0,
+        "y": -58.000022888183597
     }
 }
 
@@ -3077,7 +3077,7 @@
     "m_Group": {
         "m_Id": ""
     },
-    "m_Name": "XSampleTexture5Tap_NoAvg",
+    "m_Name": "XSampleTexture5Tap",
     "m_DrawState": {
         "m_Expanded": true,
         "m_Position": {
