@@ -28,19 +28,6 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	#endregion
 
-	#region Debug Pass Fields
-
-	[Header("Debug Pass")]
-
-	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
-	public float debugAlpha = 0.0f;
-
-	public Material debugMaterial;
-
-	XGBAAPostProcessPass debugPass;
-
-	#endregion
-
 	#region Internal Edge Detection(Removal) Pass Fields
 
 	/*
@@ -68,6 +55,19 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	#endregion
 
+	#region Debug Pass Fields
+
+	[Header("Debug Pass")]
+
+	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
+	public float debugAlpha = 0.0f;
+
+	public Material debugMaterial;
+
+	XGBAAPostProcessPass debugPass;
+
+	#endregion
+
 	#region Shared Fields
 
 	// Shared gbuffer texture
@@ -86,9 +86,6 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 		gbufferPass = new XGBAAGBufferPass(this);
 		gbufferPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
-		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugAlpha);
-		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
-
 		/*
 		edgeDetectionPass = new XGBAAEdgeDetectionPass(this, edgeDetectionMaterial);
 		edgeDetectionPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
@@ -96,14 +93,14 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+
+		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugAlpha);
+		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
 		renderer.EnqueuePass(gbufferPass);
-
-		if (debugAlpha > 0.0001f)
-			renderer.EnqueuePass(debugPass);
 
 		/*
 		if (enableEdgeDetection)
@@ -112,6 +109,9 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 		if (resolveAlpha > 0.0001f)
 			renderer.EnqueuePass(resolvePass);
+
+		if (debugAlpha > 0.0001f)
+			renderer.EnqueuePass(debugPass);
 	}
 
 	class XGBAAGBufferPass : ScriptableRenderPass

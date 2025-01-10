@@ -1,5 +1,29 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5067821600128939418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: XGBAARendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::XGBAARendererFeature
+  m_Active: 1
+  gbufferMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  shaderTagNameList:
+  - UniversalForward
+  - UniversalGBuffer
+  debugAlpha: 1
+  debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
+  resolveAlpha: 1
+  resolveMaterial: {fileID: -876546973899608171, guid: cfaf6b526a96a5e4eb595ca46557cdb2, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28,8 +52,8 @@ MonoBehaviour:
   - {fileID: 7833122117494664109}
   - {fileID: 7349709356135521944}
   - {fileID: 3352598969274636748}
-  - {fileID: 338588822796687199}
-  m_RendererFeatureMap: ad6b866f10d7b46c989ed20eb869ff65cc99f4edffd2862e5fd7b68bbde8b204
+  - {fileID: 2756510817737454840}
+  m_RendererFeatureMap: ad6b866f10d7b46c989ed20eb869ff65cc99f4edffd2862ef834c3eefb174126
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -75,10 +99,34 @@ MonoBehaviour:
   shaderTagNameList:
   - UniversalForward
   - UniversalGBuffer
-  debugAlpha: 0
-  debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
   resolveAlpha: 1
   resolveMaterial: {fileID: -876546973899608171, guid: cfaf6b526a96a5e4eb595ca46557cdb2, type: 3}
+  debugAlpha: 0
+  debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
+--- !u!114 &2756510817737454840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 021d56dc057023e4880562480faa99e2, type: 3}
+  m_Name: XGBAARendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  gbufferMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  shaderTagNameList:
+  - UniversalForward
+  - UniversalGBuffer
+  resolveAlpha: 1
+  resolveMaterial: {fileID: -876546973899608171, guid: 1b3bb60a45451ab40b577d721bce7284, type: 3}
+  debugAlpha: 0
+  debugMaterial: {fileID: -876546973899608171, guid: 56ab4902b10f8864c8d624d15c04db26, type: 3}
 --- !u!114 &3352598969274636748
 MonoBehaviour:
   m_ObjectHideFlags: 0
