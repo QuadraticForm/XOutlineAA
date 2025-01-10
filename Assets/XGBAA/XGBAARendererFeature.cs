@@ -7,6 +7,8 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class XGBAARendererFeature : ScriptableRendererFeature
 {
+	#region GBuffer Pass Fields
+
 	[Header("GBuffer Pass")]
 
 	public Material gbufferMaterial;
@@ -24,6 +26,10 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	XGBAAGBufferPass gbufferPass;
 
+	#endregion
+
+	#region Debug Pass Fields
+
 	[Header("Debug Pass")]
 
 	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
@@ -32,6 +38,10 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 	public Material debugMaterial;
 
 	XGBAAPostProcessPass debugPass;
+
+	#endregion
+
+	#region Resolve Pass Fields
 
 	[Header("Resolve Pass")]
 
@@ -42,10 +52,14 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	XGBAAPostProcessPass resolvePass;
 
+	#endregion
+
+	#region Shared Fields
+
 	// Shared gbuffer texture
 	private TextureHandle gbuffer = TextureHandle.nullHandle;
 
-	
+	#endregion
 
 	public override void Create()
 	{
@@ -115,7 +129,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 				var textureProperties = cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
-				textureProperties.colorFormat = RenderTextureFormat.RGFloat;
+				textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
 				rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XGBAA GBuffer", false);
 
 				// actual build render graph
@@ -136,7 +150,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			// 1 is the maximum value GBufferShader will output,
 			// and all value outside [-1, 1] is disregarded by the resolve pass
 			// so 2 is large enough to be used as a invalid value
-			context.cmd.ClearRenderTarget(false, true, new Color(2, 2, 2));
+			context.cmd.ClearRenderTarget(false, true, new Color(-2, 2, -2, 2));
 			// context.cmd.ClearRenderTarget(false, true, Color.black);
 
 			context.cmd.DrawRendererList(data.rendererListHandle);
