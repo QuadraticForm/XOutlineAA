@@ -124,7 +124,7 @@ MonoBehaviour:
   - UniversalForward
   - UniversalGBuffer
   resolveAlpha: 1
-  resolveMaterial: {fileID: -876546973899608171, guid: 1b3bb60a45451ab40b577d721bce7284, type: 3}
+  resolveMaterial: {fileID: -876546973899608171, guid: ad548c585d661df4fb57e0018d335339, type: 3}
   debugAlpha: 0
   debugMaterial: {fileID: -876546973899608171, guid: 56ab4902b10f8864c8d624d15c04db26, type: 3}
 --- !u!114 &3352598969274636748

@@ -699,12 +699,12 @@ GameObject:
   - component: {fileID: 511986292}
   - component: {fileID: 511986294}
   m_Layer: 0
-  m_Name: Sphere Outline
+  m_Name: Outline MeshBased
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &511986290
 Transform:
   m_ObjectHideFlags: 0
@@ -935,12 +935,12 @@ GameObject:
   - component: {fileID: 1019518471}
   - component: {fileID: 1019518473}
   m_Layer: 0
-  m_Name: Cube Outline
+  m_Name: Outline MeshBased
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1019518469
 Transform:
   m_ObjectHideFlags: 0
@@ -1425,7 +1425,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 77f071f5d83b86240827f8f2a6dd02ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1464,7 +1464,7 @@ Transform:
   m_GameObject: {fileID: 1584791933}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.527, z: 0}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1560,12 +1560,12 @@ GameObject:
   - component: {fileID: 1880413512}
   - component: {fileID: 1880413514}
   m_Layer: 0
-  m_Name: Sphere Outline
+  m_Name: Outline MeshBased
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1880413510
 Transform:
   m_ObjectHideFlags: 0
@@ -1996,7 +1996,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8900877990413379587, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8737927006123014735, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
@@ -2064,7 +2064,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 99a8db31088853849940f1397ac16907, type: 2}
     - target: {fileID: -3878867620817166774, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2954625778741113400, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -2080,11 +2080,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 99a8db31088853849940f1397ac16907, type: 2}
     - target: {fileID: -1858051351158658660, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 85910083332947636, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_Name
@@ -2132,7 +2132,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 99a8db31088853849940f1397ac16907, type: 2}
     - target: {fileID: 7034573738873676481, guid: bd4e9972ca543e148ab50ea767afd22e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2147,10 +2147,10 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1584791937}
-  - {fileID: 1942391241}
   - {fileID: 493507599}
-  - {fileID: 717575641}
   - {fileID: 1132410375}
+  - {fileID: 1942391241}
+  - {fileID: 717575641}
   - {fileID: 2026354461}
   - {fileID: 2104883705}
   - {fileID: 1687539669}

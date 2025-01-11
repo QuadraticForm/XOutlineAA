@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: 021d56dc057023e4880562480faa99e2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - gbufferMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
+  - resolveMaterial: {fileID: -876546973899608171, guid: ad548c585d661df4fb57e0018d335339, type: 3}
+  - debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
