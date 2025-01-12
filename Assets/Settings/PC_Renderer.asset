@@ -138,7 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 021d56dc057023e4880562480faa99e2, type: 3}
   m_Name: XGBAARendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   gbufferMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
   layerMask:
     serializedVersion: 2

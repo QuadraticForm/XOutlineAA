@@ -1811,6 +1811,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -8070950088555639810, guid: d665362e4f8871b4d849edf8a29a95d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c0553d6e4d8fdd4d9438f7f5bbf185d, type: 2}
     - target: {fileID: -6739276616168846049, guid: d665362e4f8871b4d849edf8a29a95d6, type: 3}
       propertyPath: m_Layer
       value: 13
@@ -1819,6 +1823,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 3fa21b3bb77da5244ab3b8ac5e2626d7, type: 2}
+    - target: {fileID: -2722104139481202066, guid: d665362e4f8871b4d849edf8a29a95d6, type: 3}
+      propertyPath: m_Layer
+      value: 13
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d665362e4f8871b4d849edf8a29a95d6, type: 3}
       propertyPath: m_Name
       value: Cube (1)
@@ -2332,6 +2340,7 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1584791937}
+  - {fileID: 1915345487}
   - {fileID: 1942391241}
   - {fileID: 717575641}
   - {fileID: 2026354461}
@@ -2339,4 +2348,3 @@ SceneRoots:
   - {fileID: 18818641}
   - {fileID: 1687539669}
   - {fileID: 1288321266}
-  - {fileID: 1915345487}
