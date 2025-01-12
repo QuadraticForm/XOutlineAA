@@ -53,10 +53,11 @@ MonoBehaviour:
   - {fileID: 7349709356135521944}
   - {fileID: 3352598969274636748}
   - {fileID: 2756510817737454840}
-  m_RendererFeatureMap: ad6b866f10d7b46c989ed20eb869ff65cc99f4edffd2862ef834c3eefb174126
+  - {fileID: 333368230544930190}
+  m_RendererFeatureMap: ad6b866f10d7b46c989ed20eb869ff65cc99f4edffd2862ef834c3eefb1741268ef507b1a35ca004
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
-  postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
+  postProcessData: {fileID: 0}
   m_AssetVersion: 2
   m_OpaqueLayerMask:
     serializedVersion: 2
@@ -79,6 +80,28 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
+--- !u!114 &333368230544930190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf51b1d61f847645860087161dee28b, type: 3}
+  m_Name: XOutlineRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 9216
+  shaderTagNameList:
+  - UniversalForward
+  resolveAlpha: 1
+  resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  debugAlpha: 0
+  debugMaterial: {fileID: -876546973899608171, guid: f81d0fa22e1a0c14d9d92d574c1da298, type: 3}
 --- !u!114 &338588822796687199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,7 +146,7 @@ MonoBehaviour:
   shaderTagNameList:
   - UniversalForward
   - UniversalGBuffer
-  resolveAlpha: 1
+  resolveAlpha: 0
   resolveMaterial: {fileID: -876546973899608171, guid: ad548c585d661df4fb57e0018d335339, type: 3}
   debugAlpha: 0
   debugMaterial: {fileID: -876546973899608171, guid: 56ab4902b10f8864c8d624d15c04db26, type: 3}
@@ -153,7 +176,7 @@ MonoBehaviour:
     overrideMaterialPassIndex: 0
     overrideShader: {fileID: 0}
     overrideShaderPassIndex: 0
-    overrideMode: 1
+    overrideMode: 0
     overrideDepthState: 0
     depthCompareFunction: 4
     enableWrite: 1
@@ -201,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
   m_Name: ScreenSpaceAmbientOcclusion
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_Settings:
     AOMethod: 0
     Downsample: 0

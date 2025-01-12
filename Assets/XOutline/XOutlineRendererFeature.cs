@@ -1,17 +1,19 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 using static Unity.Burst.Intrinsics.X86.Avx;
+using static UnityEngine.Rendering.Universal.ShaderInput;
 
-public class XGBAARendererFeature : ScriptableRendererFeature
+public class XOutlineRendererFeature : ScriptableRendererFeature
 {
 	#region GBuffer Pass Fields
 
 	[Header("GBuffer Pass")]
 
-	public Material gbufferMaterial;
+	// public Material gbufferMaterial;
 	public LayerMask layerMask = 0;
 
 	public List<string> shaderTagNameList = new List<string>
@@ -24,21 +26,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 	// ShaderTagId list moved to RenderFeature as a field
 	private List<ShaderTagId> shaderTagIdList;
 
-	XGBAAGBufferPass gbufferPass;
-
-	#endregion
-
-	#region Internal Edge Detection(Removal) Pass Fields
-
-	/*
-	[Header("Edge Detection Pass")]
-
-	public bool enableEdgeDetection = false;
-
-	public Material edgeDetectionMaterial;
-
-	private XGBAAEdgeDetectionPass edgeDetectionPass;
-	*/
+	XOutlineGBufferPass gbufferPass;
 
 	#endregion
 
@@ -51,7 +39,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	public Material resolveMaterial;
 
-	XGBAAPostProcessPass resolvePass;
+	XOutlinePostProcessPass resolvePass;
 
 	#endregion
 
@@ -64,7 +52,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 	public Material debugMaterial;
 
-	XGBAAPostProcessPass debugPass;
+	XOutlinePostProcessPass debugPass;
 
 	#endregion
 
@@ -83,45 +71,57 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			shaderTagIdList.Add(new ShaderTagId(passName));
 		}
 
-		gbufferPass = new XGBAAGBufferPass(this);
+		gbufferPass = new XOutlineGBufferPass(this);
 		gbufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
-		resolvePass = new XGBAAPostProcessPass(this, resolveMaterial, resolveAlpha);
+		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 
-		debugPass = new XGBAAPostProcessPass(this, debugMaterial, debugAlpha);
+		debugPass = new XOutlinePostProcessPass(this, debugMaterial, debugAlpha);
 		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
-		if (gbufferMaterial != null)
-			renderer.EnqueuePass(gbufferPass);
+		renderer.EnqueuePass(gbufferPass);
 
-		if (resolveMaterial != null && resolveAlpha > 0.0001f)
+		/*
+		if (enableEdgeDetection)
+			renderer.EnqueuePass(edgeDetectionPass);
+		*/
+
+		if (resolveAlpha > 0.0001f)
 			renderer.EnqueuePass(resolvePass);
 
-		if (debugMaterial != null && debugAlpha > 0.0001f)
+		if (debugAlpha > 0.0001f)
 			renderer.EnqueuePass(debugPass);
 	}
 
-	class XGBAAGBufferPass : ScriptableRenderPass
+	class XOutlineGBufferPass : ScriptableRenderPass
 	{
-		private XGBAARendererFeature rendererFeature;
+		private XOutlineRendererFeature rendererFeature;
+		// private MaterialPropertyBlock propertyBlock;
+
+		public static class ShaderPropertyId
+		{
+			public static readonly int IsGBufferPass = Shader.PropertyToID("_IsGBufferPass");
+		}
 
 		private class PassData
 		{
 			public RendererListHandle rendererListHandle;
 		}
 
-		public XGBAAGBufferPass(XGBAARendererFeature rendererFeature)
+		public XOutlineGBufferPass(XOutlineRendererFeature rendererFeature)
 		{
 			this.rendererFeature = rendererFeature;
+			// this.propertyBlock = new MaterialPropertyBlock();
+			// this.propertyBlock.SetFloat("_IsGBufferPass", 1.0f);
 		}
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
 		{
-			using (var builder = renderGraph.AddRasterRenderPass<PassData>("XGBAA GBuffer Pass", out var passData))
+			using (var builder = renderGraph.AddRasterRenderPass<PassData>("XOutline GBuffer Pass", out var passData))
 			{
 				// get all sorts of data from the frame context
 
@@ -135,9 +135,9 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 				var sortFlags = cameraData.defaultOpaqueSortFlags;
 				var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
 
-				drawSettings.overrideMaterial = rendererFeature.gbufferMaterial;
+				// drawSettings.overrideMaterial = rendererFeature.gbufferMaterial;
 
-				var filterSettings = new FilteringSettings(RenderQueueRange.opaque, rendererFeature.layerMask);
+				var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
 
 				var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
 				passData.rendererListHandle = renderGraph.CreateRendererList(rendererListParameters);
@@ -147,34 +147,31 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 				var textureProperties = cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
 				textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
-				rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XGBAA GBuffer", false);
+				rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer", false);
 
 				// actual build render graph
+
+				builder.AllowGlobalStateModification(true);
 
 				builder.SetRenderAttachment(rendererFeature.gbuffer, 0);
 				builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 				builder.UseRendererList(passData.rendererListHandle);
 
-				builder.SetRenderFunc((PassData data, RasterGraphContext context) => ExecutePass(data, context));
+				builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+				{
+					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 1);
+
+					context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+
+					context.cmd.DrawRendererList(data.rendererListHandle);
+
+					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 0);
+				});
 			}
-		}
-
-		static void ExecutePass(PassData data, RasterGraphContext context)
-		{
-			// Clear with 2
-			// gbuffer stores the pixel-edge distance,
-			// 0 means on the edge, 1 means 1 pixel away from the edge,
-			// 1 is the maximum value GBufferShader will output,
-			// and all value outside [-1, 1] is disregarded by the resolve pass
-			// so 2 is large enough to be used as a invalid value
-			context.cmd.ClearRenderTarget(false, true, new Color(-2, 2, -2, 2));
-			// context.cmd.ClearRenderTarget(false, true, Color.black);
-
-			context.cmd.DrawRendererList(data.rendererListHandle);
 		}
 	}
 
-	class XGBAAPostProcessPass : ScriptableRenderPass
+	class XOutlinePostProcessPass : ScriptableRenderPass
 	{
 		private class CopyCameraColorPassData
 		{
@@ -193,10 +190,10 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 		public Material postProcessMaterial;
 		public float alpha = 1;
-		private XGBAARendererFeature rendererFeature;
+		private XOutlineRendererFeature rendererFeature;
 		private MaterialPropertyBlock propertyBlock;
 
-		public XGBAAPostProcessPass(XGBAARendererFeature rendererFeature, Material postProcessMaterial, float alpha)
+		public XOutlinePostProcessPass(XOutlineRendererFeature rendererFeature, Material postProcessMaterial, float alpha)
 		{
 			this.rendererFeature = rendererFeature;
 			propertyBlock = new MaterialPropertyBlock();
@@ -214,14 +211,14 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			// create a texture to copy current active color texture to
 
 			var targetDesc = renderGraph.GetTextureDesc(resourcesData.cameraColor);
-			targetDesc.name = "XGBAA Camera Color";
+			targetDesc.name = "XOutline Camera Color";
 			targetDesc.clearBuffer = false;
 
 			var cameraColorCopy = renderGraph.CreateTexture(targetDesc);
 
 			// build render graph for copying camera color
 
-			using (var builder = renderGraph.AddRasterRenderPass<CopyCameraColorPassData>("XGBAA Copy Camera Color", out var passData, profilingSampler))
+			using (var builder = renderGraph.AddRasterRenderPass<CopyCameraColorPassData>("XOutline Copy Camera Color", out var passData, profilingSampler))
 			{
 				passData.source = resourcesData.activeColorTexture;
 				passData.destination = cameraColorCopy;
@@ -238,7 +235,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 			// build render graph for post process pass
 
-			using (var builder = renderGraph.AddRasterRenderPass<MainPassData>("XGBAA Post-Process", out var passData, profilingSampler))
+			using (var builder = renderGraph.AddRasterRenderPass<MainPassData>("XOutline Post-Process", out var passData, profilingSampler))
 			{
 				passData.cameraColorCopy = cameraColorCopy;
 				passData.cameraDepth = resourcesData.cameraDepthTexture;
@@ -267,56 +264,4 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			}
 		}
 	}
-
-	/*
-	public class XGBAAEdgeDetectionPass : ScriptableRenderPass
-	{
-		private XGBAARendererFeature rendererFeature;
-		private Material edgeDetectionMaterial;
-		private MaterialPropertyBlock propertyBlock;
-
-		public XGBAAEdgeDetectionPass(XGBAARendererFeature rendererFeature, Material edgeDetectionMaterial)
-		{
-			this.rendererFeature = rendererFeature;
-			this.edgeDetectionMaterial = edgeDetectionMaterial;
-
-			propertyBlock = new MaterialPropertyBlock();
-		}
-
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
-		{
-			using (var builder = renderGraph.AddRasterRenderPass<PassData>("XGBAA Edge Detection Pass", out var passData))
-			{
-				var resourcesData = frameContext.Get<UniversalResourceData>();
-				var cameraData = frameContext.Get<UniversalCameraData>();
-
-				passData.cameraDepth = resourcesData.cameraDepthTexture;
-				passData.cameraNormals = resourcesData.cameraNormalsTexture;
-				passData.destination = resourcesData.activeColorTexture;
-
-				builder.UseTexture(passData.cameraDepth);
-				builder.UseTexture(passData.cameraNormals);
-				builder.SetRenderAttachment(passData.destination, 0);
-
-				builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
-				{
-					var cmd = context.cmd;
-
-					propertyBlock.SetTexture("_CameraDepthTexture", data.cameraDepth);
-					propertyBlock.SetTexture("_CameraNormalsTexture", data.cameraNormals);
-
-					context.cmd.DrawProcedural(Matrix4x4.identity, edgeDetectionMaterial, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
-				});
-			}
-		}
-
-		private class PassData
-		{
-			public TextureHandle cameraDepth;
-			public TextureHandle cameraNormals;
-			public TextureHandle destination;
-		}
-	}
-
-	*/
 }

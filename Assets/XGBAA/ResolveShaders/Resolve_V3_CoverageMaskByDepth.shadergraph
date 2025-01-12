@@ -1446,7 +1446,7 @@
     "m_SlotType": 0,
     "m_Hidden": false,
     "m_ShaderOutputName": "_DepthTex",
-    "m_StageCapability": 2,
+    "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
         "m_SerializedTexture": "",
@@ -1521,8 +1521,8 @@
     "m_ObjectId": "07f4375a20444ad7afb7cadc60235441",
     "m_Title": "Coverage: (0, -1)",
     "m_Position": {
-        "x": -3895.428466796875,
-        "y": -1685.1429443359375
+        "x": -3894.499755859375,
+        "y": -1684.4998779296875
     }
 }
 
@@ -1785,8 +1785,8 @@
     "m_ObjectId": "0df7d70254d343a1af0cf7338855f338",
     "m_Title": "1 - Coverage From Other-Edges",
     "m_Position": {
-        "x": -2626.285400390625,
-        "y": -807.4287109375
+        "x": -2625.499755859375,
+        "y": -806.4999389648438
     }
 }
 
@@ -2377,8 +2377,8 @@
     "m_ObjectId": "23351a9e93344faa88210a50ade9ca29",
     "m_Title": "1 - Coverage From Self-Edges",
     "m_Position": {
-        "x": -2626.285400390625,
-        "y": -1037.1429443359375
+        "x": -2625.499755859375,
+        "y": -1035.9998779296875
     }
 }
 
@@ -3454,8 +3454,8 @@
     "m_ObjectId": "44bfab9593db42969f89928a34ab95a9",
     "m_Title": "(1, 0)",
     "m_Position": {
-        "x": -5196.00048828125,
-        "y": -425.142822265625
+        "x": -5194.99951171875,
+        "y": -424.0
     }
 }
 
@@ -3580,8 +3580,8 @@
     "m_ObjectId": "4b968befa2c641afa63ce328ef3e5d1d",
     "m_Title": "Coverage: (-1, 0)",
     "m_Position": {
-        "x": -3897.142822265625,
-        "y": -2106.857421875
+        "x": -3896.499755859375,
+        "y": -2105.999755859375
     }
 }
 
@@ -4243,8 +4243,8 @@
     "m_ObjectId": "6649a0af34cd495aac8020b99725f8ce",
     "m_Title": "(-1, 0)",
     "m_Position": {
-        "x": -5196.00048828125,
-        "y": -710.8570556640625
+        "x": -5194.99951171875,
+        "y": -709.9999389648438
     }
 }
 
@@ -4736,8 +4736,8 @@
     "m_ObjectId": "78213a98efac4434b700d11c92aad3d2",
     "m_Title": "(0, -1)",
     "m_Position": {
-        "x": -5196.00048828125,
-        "y": -148.5712890625
+        "x": -5194.99951171875,
+        "y": -147.5
     }
 }
 
@@ -5046,8 +5046,8 @@
     "m_ObjectId": "870c323303f34645ae9a91d58bf472ad",
     "m_Title": "(0, 1)",
     "m_Position": {
-        "x": -5200.00048828125,
-        "y": 125.71435546875
+        "x": -5198.99951171875,
+        "y": 126.5
     }
 }
 
@@ -5174,8 +5174,8 @@
     "m_ObjectId": "8b0e87e137f24f26a3043647b86f0702",
     "m_Title": "Sample GBuffer",
     "m_Position": {
-        "x": -4783.4287109375,
-        "y": -1842.8570556640625
+        "x": -4782.49951171875,
+        "y": -1841.9998779296875
     }
 }
 
@@ -5396,6 +5396,21 @@
     "m_StageCapability": 2,
     "m_Value": true,
     "m_DefaultValue": false
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "9426e8316038490090cca64cac90303d",
+    "m_Id": -274356002,
+    "m_DisplayName": "Tolerance",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "_Tolerance",
+    "m_StageCapability": 2,
+    "m_Value": 1.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
 }
 
 {
@@ -6718,6 +6733,9 @@
             "m_Id": "3119b994c5cf45ed8562b0e3cf8f83e4"
         },
         {
+            "m_Id": "9426e8316038490090cca64cac90303d"
+        },
+        {
             "m_Id": "9274fc61d35a4810a088fc1e83d6e77c"
         },
         {
@@ -6740,7 +6758,8 @@
         "1ed90d93-55ff-4da4-8214-f4cf51079c40",
         "b9924b6a-f5ec-40d2-854d-6ebd52e4fb2f",
         "1848debc-eb0a-4227-8e32-3f52ed5ae9c6",
-        "348752f7-34a1-4a4c-ab6b-43ab7a402a41"
+        "348752f7-34a1-4a4c-ab6b-43ab7a402a41",
+        "c800c5e2-22fd-4a42-afd3-cb566e9c2c3b"
     ],
     "m_PropertyIds": [
         -555790313,
@@ -6749,7 +6768,8 @@
         -602584129,
         1809127249,
         -826712619,
-        -1801302649
+        -1801302649,
+        -274356002
     ],
     "m_Dropdowns": [],
     "m_DropdownSelectedEntries": []
@@ -7110,8 +7130,8 @@
     "m_ObjectId": "d41fcd57af3f47ed84f26c31d989da90",
     "m_Title": "Coverage: (0, 1)",
     "m_Position": {
-        "x": -3899.428466796875,
-        "y": -1483.4285888671875
+        "x": -3898.499755859375,
+        "y": -1482.4998779296875
     }
 }
 
@@ -7176,8 +7196,8 @@
     "m_ObjectId": "d52ef7a1895044719f97cfe697631e5f",
     "m_Title": "Coverage From Self-Edges",
     "m_Position": {
-        "x": -2160.5712890625,
-        "y": -1256.0
+        "x": -2160.0,
+        "y": -1255.0
     }
 }
 
@@ -7187,8 +7207,8 @@
     "m_ObjectId": "d6796314137c4ddcbd3bed89487cc857",
     "m_Title": "Coverage: (1, 0)",
     "m_Position": {
-        "x": -3897.71435546875,
-        "y": -1886.2855224609375
+        "x": -3896.999755859375,
+        "y": -1885.4998779296875
     }
 }
 
@@ -7847,8 +7867,8 @@
     "m_ObjectId": "f02e8a9a08854fcb9e960ed618b29b76",
     "m_Title": "Coverage From Other Edges",
     "m_Position": {
-        "x": -2137.142822265625,
-        "y": -545.7142333984375
+        "x": -2136.499755859375,
+        "y": -544.9999389648438
     }
 }
 
