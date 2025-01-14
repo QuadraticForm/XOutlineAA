@@ -1,11 +1,11 @@
 fileFormatVersion: 2
-guid: 68af361f169b5684d9c7759936e5a4ca
+guid: d8dc6c163d80e294fb6181d7d83dd5da
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 22202
   internalIDToNameTable: []
   externalObjects: {}
   materials:
-    materialImportMode: 2
+    materialImportMode: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -16,6 +16,8 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -31,9 +33,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations: []
     isReadable: 0
+    useForSoftBody: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 100
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -46,7 +49,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
@@ -70,13 +73,22 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 0
     normalCalculationMode: 4
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
   importAnimation: 1
+  canReduceDeltaValueArray: 1
+  useAclCompression: 1
+  useAclDatabase: 1
+  useAclForCurves: 1
+  aCLQuality: 4
+  aCLErrorThreshold: 1
+  aclCurvesErrorThreshold: 0.01
+  aCLErrorModifier: 1
+  aclDatabaseRatio: 0.5
   humanDescription:
     serializedVersion: 3
     human: []
@@ -88,13 +100,45 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
+    globalScale: 100
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
+  aCLUseAvatarMask: 0
+  aCLAvatarMaskClipInfo:
+    serializedVersion: 16
+    name: 
+    takeName: 
+    internalID: 0
+    firstFrame: 0
+    lastFrame: 0
+    wrapMode: 0
+    orientationOffsetY: 0
+    level: 0
+    cycleOffset: 0
+    loop: 0
+    hasAdditiveReferencePose: 0
+    loopTime: 0
+    loopBlend: 0
+    loopBlendOrientation: 0
+    loopBlendPositionY: 0
+    loopBlendPositionXZ: 0
+    keepOriginalOrientation: 0
+    keepOriginalPositionY: 1
+    keepOriginalPositionXZ: 0
+    heightFromFeet: 0
+    mirror: 0
+    bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+    curves: []
+    events: []
+    transformMask: []
+    maskType: 3
+    maskSource: {instanceID: 0}
+    additiveReferencePoseFrame: 0
+  aCLMaskUnlockEditWhenCopy: 0
   animationType: 2
   humanoidOversampling: 1
   avatarSetup: 0
@@ -102,6 +146,6 @@ ModelImporter:
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
-  userData: '{"GenMergedNormal":false,"writeToUV1":false,"writeToUV2":false,"writeToUV3":false}'
+  userData: 
   assetBundleName: 
   assetBundleVariant: 
