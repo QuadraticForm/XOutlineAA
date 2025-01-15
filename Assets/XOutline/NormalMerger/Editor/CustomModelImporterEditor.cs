@@ -123,13 +123,11 @@ namespace xoutline
 
 		void OnDestroy()
 		{
-			/*
 			if (defaultEditor != null)
 			{
 				DestroyImmediate(defaultEditor);
 				defaultEditor = null;
 			}
-			*/
 		}
 
 		private void DrawBoolProperty(UserDataUtil.Property<bool> property)
