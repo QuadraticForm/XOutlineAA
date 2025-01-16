@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.AssetImporters;
+
+using Newtonsoft.Json;
+//using Unity.Plastic.Newtonsoft.Json;
 
 namespace xoutline
 {

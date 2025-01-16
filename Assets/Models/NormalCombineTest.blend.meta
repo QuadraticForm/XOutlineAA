@@ -102,6 +102,6 @@ ModelImporter:
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
-  userData: '{"GenMergedNormal":false,"writeToUV1":false,"writeToUV2":false,"writeToUV3":false,"mergedNormalUVChannel":3,"genMergedNormal":true}'
+  userData: '{"mergedNormalUVChannel":3,"genMergedNormal":true}'
   assetBundleName: 
   assetBundleVariant: 
