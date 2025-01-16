@@ -114,20 +114,25 @@ namespace xoutline
 
 				dynMethod.Invoke(defaultEditor, new object[] { this });
 			}
+
+			// defaultEditor.OnEnable();
 		}
 
 		void OnDisable()
 		{
-			defaultEditor.OnDisable();
+			if (defaultEditor != null)
+				defaultEditor.OnDisable();
 		}
 
 		void OnDestroy()
 		{
+			/*
 			if (defaultEditor != null)
 			{
 				DestroyImmediate(defaultEditor);
 				defaultEditor = null;
 			}
+			*/
 		}
 
 		private void DrawBoolProperty(UserDataUtil.Property<bool> property)
