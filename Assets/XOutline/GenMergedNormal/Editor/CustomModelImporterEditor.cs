@@ -139,45 +139,57 @@ namespace xoutline
 
 		private void DrawBoolProperty(UserDataUtil.Property<bool> property)
 		{
-			var toggleResult = EditorGUILayout.Toggle(property.displayName, property.value);
+			EditorGUI.showMixedValue = !MultiEditIsAllSameAsThis(property);
 
-			if (toggleResult != property.value)
+			var newValue = EditorGUILayout.Toggle(property.displayName, property.value);
+
+			if (newValue != property.value)
 			{
-				property.value = toggleResult;
-				WriteToUserData(property);
+				property.value = newValue;
+				MultiEditWriteToUserData(property);
 			}
+
+			EditorGUI.showMixedValue = false;
+		}
+
+		private void DrawIntPopupProperty(UserDataUtil.Property<int> property, string[] displayOptions, int[] optionValues)
+		{
+			EditorGUI.showMixedValue = !MultiEditIsAllSameAsThis(property);
+
+			var newValue = EditorGUILayout.IntPopup(property.displayName, property.value, displayOptions, optionValues);
+
+			if (newValue != property.value)
+			{
+				property.value = newValue;
+				MultiEditWriteToUserData(property);
+			}
+
+			EditorGUI.showMixedValue = false;
 		}
 
 		public override void OnInspectorGUI()
 		{
 			defaultEditor.OnInspectorGUI();
 
-			// Header
+			// read from user data (from the first target)
+			customModelProps.ReadFromUserData(((ModelImporter)target).userData);
+
+			// Draw: Header
 
 			EditorGUILayout.Separator();
 
 			EditorGUILayout.LabelField("XOutline", EditorStyles.boldLabel);
 
-			// read from user data
-			string json = ((ModelImporter)target).userData;
-			customModelProps.ReadFromUserData(json);
-
-			// Gen Merged Normal
+			// Draw: Gen Merged Normal
 
 			DrawBoolProperty(customModelProps.genMergedNormal);
 
-			// Merged Normal UV Channel
+			// Draw: Merged Normal UV Channel
 
-			var uvChannelProp = customModelProps.mergedNormalUVChannel;
-
-			var newUvChannel =
-				EditorGUILayout.IntPopup(uvChannelProp.displayName, uvChannelProp.value,
+			DrawIntPopupProperty(customModelProps.mergedNormalUVChannel,
 				new string[] { "UV1", "UV2", "UV3" }, new int[] { 1, 2, 3 });
 
-			if (newUvChannel != uvChannelProp.value)
-				WriteToUserData(uvChannelProp);
-
-			// Info about UVs
+			// Draw: Info about UVs
 
 			string infoAboutUVs = "UV1, UV2, UV3 correspond to mesh.uv2, mesh.uv3, mesh.uv4";
 			string infoAboutUVs2 = "UV1, UV2 might be used for lightmap by unity";
@@ -190,7 +202,37 @@ namespace xoutline
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		void WriteToUserData<T>(UserDataUtil.Property<T> prop)
+		/// <summary>
+		/// multi-edit read. this is a little special, we don't need data from all targets,
+		/// just the first one, and wether it's the same for all targets.
+		/// </summary>
+		/// <returns>if all values are the same</returns>
+		bool MultiEditReadFromUserDatas<T>(UserDataUtil.Property<T> prop)
+		{
+			var firstImporter = (ModelImporter)targets[0];
+			UserDataUtil.ReadFromUserData(firstImporter.userData, prop);
+
+			return MultiEditIsAllSameAsThis(prop);
+		}
+
+		bool MultiEditIsAllSameAsThis<T>(UserDataUtil.Property<T> prop)
+		{
+			var firstValue = prop.value;
+
+			for (int i = 1; i < targets.Length; i++)
+			{
+				var importer = (ModelImporter)targets[i];
+				UserDataUtil.ReadFromUserData(importer.userData, prop);
+				if (!EqualityComparer<T>.Default.Equals(firstValue, prop.value))
+				{
+					prop.value = firstValue;
+					return false;
+				}
+			}
+			return true;
+		}
+
+		void MultiEditWriteToUserData<T>(UserDataUtil.Property<T> prop)
 		{
 			for (int i = 0; i < targets.Length; i++)
 			{
