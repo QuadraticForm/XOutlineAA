@@ -100,7 +100,7 @@ MonoBehaviour:
   - UniversalForward
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
-  debugAlpha: 0
+  debugAlpha: 1
   debugMaterial: {fileID: -876546973899608171, guid: f81d0fa22e1a0c14d9d92d574c1da298, type: 3}
 --- !u!114 &338588822796687199
 MonoBehaviour:
