@@ -127,7 +127,7 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _THICKNESSMODE: 0
-    - _Thickness: 5
+    - _Thickness: 2
     - _ThicknessInPixel: 0
     - _ThicknessInWS: 1
     - _ThicknessSceneUnit: 0.01

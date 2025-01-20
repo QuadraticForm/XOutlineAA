@@ -2682,7 +2682,7 @@
     "m_ObjectId": "339d6010780a470e99b54bf907e86011",
     "m_Title": "Screen Size",
     "m_Position": {
-        "x": -2952.0,
+        "x": -2951.999755859375,
         "y": -603.0
     }
 }
@@ -2840,8 +2840,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -5645.99951171875,
-            "y": -2093.999755859375,
+            "x": -5547.5,
+            "y": -1881.9998779296875,
             "width": 129.5,
             "height": 117.9998779296875
         }
@@ -3349,10 +3349,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6020.5,
-            "y": -2147.000244140625,
+            "x": -5922.0,
+            "y": -1934.9998779296875,
             "width": 208.0,
-            "height": 327.0001220703125
+            "height": 327.0
         }
     },
     "m_Slots": [
@@ -4521,8 +4521,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6329.50048828125,
-            "y": -1384.5003662109375,
+            "x": -6329.49951171875,
+            "y": -1384.5,
             "width": 194.5,
             "height": 34.0001220703125
         }
@@ -5313,8 +5313,8 @@
     "m_ObjectId": "8d755fd8a6194f249f29d50cef686f6f",
     "m_Title": "Face Normal in View Space, only keep X Y, ",
     "m_Position": {
-        "x": -6045.5,
-        "y": -2205.5
+        "x": -5947.0,
+        "y": -1993.4998779296875
     }
 }
 
@@ -5663,8 +5663,8 @@
     "m_ObjectId": "96f199efbfa2462fbc20958aece2651b",
     "m_Title": "Normal in View Space, only keep X Y",
     "m_Position": {
-        "x": -5675.00048828125,
-        "y": -1426.00048828125
+        "x": -5675.0,
+        "y": -1426.0
     }
 }
 
@@ -5688,7 +5688,7 @@
     "m_ObjectId": "9a70ad083a7a4b30bea8e5cd0afb78bc",
     "m_Title": "View Relative Thickness",
     "m_Position": {
-        "x": -5152.00048828125,
+        "x": -5152.0,
         "y": -856.0
     }
 }
@@ -6199,8 +6199,8 @@
     "m_ObjectId": "ac1f33b2e5d74f4284d1d5227ad3db30",
     "m_Title": "Offseted Position In View Space",
     "m_Position": {
-        "x": -4187.99951171875,
-        "y": -1008.4999389648438
+        "x": -4188.0,
+        "y": -1008.5
     }
 }
 
@@ -6286,8 +6286,8 @@
     "m_ObjectId": "aeccd5bef6ed44a4916a38046099d22e",
     "m_Title": "VIew Space Z",
     "m_Position": {
-        "x": -6319.50048828125,
-        "y": -896.5
+        "x": -6319.5,
+        "y": -896.499755859375
     }
 }
 
@@ -6564,8 +6564,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -5488.49951171875,
-            "y": -2093.999755859375,
+            "x": -5390.0,
+            "y": -1881.9998779296875,
             "width": 131.5,
             "height": 94.0
         }
@@ -7550,7 +7550,7 @@
     "m_ObjectId": "cf5cb4d8dfba49aab51579a6c721eb8c",
     "m_Title": "View Relative Switch",
     "m_Position": {
-        "x": -5621.00048828125,
+        "x": -5621.0,
         "y": -949.5
     }
 }
@@ -8656,8 +8656,8 @@
     "m_ObjectId": "f75594ac99ae4274a89d3eef38449e73",
     "m_Title": "Thickness",
     "m_Position": {
-        "x": -5630.50048828125,
-        "y": -662.0000610351563
+        "x": -5630.5,
+        "y": -662.0
     }
 }
 
