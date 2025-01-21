@@ -1,15 +1,12 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
-using static Unity.Burst.Intrinsics.X86.Avx;
-using static UnityEngine.Rendering.Universal.ShaderInput;
 
-public class XOutlineRendererFeature : ScriptableRendererFeature
+public class XOutlineAARendererFeature : ScriptableRendererFeature
 {
-	#region Front Normal Pass Fields
+	#region GBuffer Passes Fields
 
 	[Header("GBuffer Passes")]
 
@@ -28,11 +25,11 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	public Material frontNormalMaterial;
 
-	XOutlineGBufferPass backNormalPass;
+	XOutlineGBufferPass outlineGBufferPass;
+
+	public Material outlineMaterial;
 
 	#endregion
-
-
 
 	#region Resolve Pass Fields
 
@@ -75,10 +72,11 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			shaderTagIdList.Add(new ShaderTagId(passName));
 		}
 
-		frontNormalPass = new XOutlineGBufferPass(this, frontNormalMaterial);
+		frontNormalPass = new XOutlineGBufferPass(this, frontNormalMaterial, clearGBuffer: true, createGBuffer: true);
 		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
-		backNormalPass = new XOutlineGBufferPass(this);
+		outlineGBufferPass = new XOutlineGBufferPass(this, outlineMaterial, clearGBuffer: false, createGBuffer: false);
+		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
@@ -90,11 +88,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
 		renderer.EnqueuePass(frontNormalPass);
-
-		/*
-		if (enableEdgeDetection)
-			renderer.EnqueuePass(edgeDetectionPass);
-		*/
+		renderer.EnqueuePass(outlineGBufferPass);
 
 		if (resolveAlpha > 0.0001f)
 			renderer.EnqueuePass(resolvePass);
@@ -105,8 +99,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	class XOutlineGBufferPass : ScriptableRenderPass
 	{
-		private XOutlineRendererFeature rendererFeature;
+		private XOutlineAARendererFeature rendererFeature;
 		private Material overrideMaterial;
+		private bool clearGBuffer;
+		private bool createGBuffer;
 
 		public static class ShaderPropertyId
 		{
@@ -118,10 +114,12 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			public RendererListHandle rendererListHandle;
 		}
 
-		public XOutlineGBufferPass(XOutlineRendererFeature rendererFeature, Material overrideMaterial = null)
+		public XOutlineGBufferPass(XOutlineAARendererFeature rendererFeature, Material overrideMaterial = null, bool clearGBuffer = false, bool createGBuffer = false)
 		{
 			this.rendererFeature = rendererFeature;
 			this.overrideMaterial = overrideMaterial;
+			this.clearGBuffer = clearGBuffer;
+			this.createGBuffer = createGBuffer;
 		}
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
@@ -155,7 +153,9 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				var textureProperties = cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
 				textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
-				rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer", false);
+
+				if (createGBuffer)
+					rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer", false);
 
 				// actual build render graph
 
@@ -169,7 +169,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				{
 					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 1);
 
-					context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+					if (clearGBuffer)
+						context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
 
 					context.cmd.DrawRendererList(data.rendererListHandle);
 
@@ -198,10 +199,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 		public Material postProcessMaterial;
 		public float alpha = 1;
-		private XOutlineRendererFeature rendererFeature;
+		private XOutlineAARendererFeature rendererFeature;
 		private MaterialPropertyBlock propertyBlock;
 
-		public XOutlinePostProcessPass(XOutlineRendererFeature rendererFeature, Material postProcessMaterial, float alpha)
+		public XOutlinePostProcessPass(XOutlineAARendererFeature rendererFeature, Material postProcessMaterial, float alpha)
 		{
 			this.rendererFeature = rendererFeature;
 			propertyBlock = new MaterialPropertyBlock();
