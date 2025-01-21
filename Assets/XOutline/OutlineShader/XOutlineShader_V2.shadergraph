@@ -2682,7 +2682,7 @@
     "m_ObjectId": "339d6010780a470e99b54bf907e86011",
     "m_Title": "Screen Size",
     "m_Position": {
-        "x": -2951.999755859375,
+        "x": -2952.0,
         "y": -603.0
     }
 }
@@ -5314,7 +5314,7 @@
     "m_Title": "Face Normal in View Space, only keep X Y, ",
     "m_Position": {
         "x": -5947.0,
-        "y": -1993.4998779296875
+        "y": -1993.5
     }
 }
 
@@ -6287,7 +6287,7 @@
     "m_Title": "VIew Space Z",
     "m_Position": {
         "x": -6319.5,
-        "y": -896.499755859375
+        "y": -896.5
     }
 }
 

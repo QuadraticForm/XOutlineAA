@@ -9,11 +9,10 @@ using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
-	#region GBuffer Pass Fields
+	#region Front Normal Pass Fields
 
-	[Header("GBuffer Pass")]
+	[Header("GBuffer Passes")]
 
-	// public Material gbufferMaterial;
 	public LayerMask layerMask = 0;
 
 	public List<string> shaderTagNameList = new List<string>
@@ -23,12 +22,17 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 							// (which doesn't have a light mode in UniversalForward, but do have a UniversalGBuffer pass)
 	};
 
-	// ShaderTagId list moved to RenderFeature as a field
 	private List<ShaderTagId> shaderTagIdList;
 
-	XOutlineGBufferPass gbufferPass;
+	XOutlineGBufferPass frontNormalPass;
+
+	public Material frontNormalMaterial;
+
+	XOutlineGBufferPass backNormalPass;
 
 	#endregion
+
+
 
 	#region Resolve Pass Fields
 
@@ -71,8 +75,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			shaderTagIdList.Add(new ShaderTagId(passName));
 		}
 
-		gbufferPass = new XOutlineGBufferPass(this);
-		gbufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+		frontNormalPass = new XOutlineGBufferPass(this, frontNormalMaterial);
+		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+
+		backNormalPass = new XOutlineGBufferPass(this);
 
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
@@ -83,7 +89,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
-		renderer.EnqueuePass(gbufferPass);
+		renderer.EnqueuePass(frontNormalPass);
 
 		/*
 		if (enableEdgeDetection)
@@ -100,7 +106,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	class XOutlineGBufferPass : ScriptableRenderPass
 	{
 		private XOutlineRendererFeature rendererFeature;
-		// private MaterialPropertyBlock propertyBlock;
+		private Material overrideMaterial;
 
 		public static class ShaderPropertyId
 		{
@@ -112,11 +118,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			public RendererListHandle rendererListHandle;
 		}
 
-		public XOutlineGBufferPass(XOutlineRendererFeature rendererFeature)
+		public XOutlineGBufferPass(XOutlineRendererFeature rendererFeature, Material overrideMaterial = null)
 		{
 			this.rendererFeature = rendererFeature;
-			// this.propertyBlock = new MaterialPropertyBlock();
-			// this.propertyBlock.SetFloat("_IsGBufferPass", 1.0f);
+			this.overrideMaterial = overrideMaterial;
 		}
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
@@ -135,7 +140,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				var sortFlags = cameraData.defaultOpaqueSortFlags;
 				var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
 
-				// drawSettings.overrideMaterial = rendererFeature.gbufferMaterial;
+				if (overrideMaterial != null)
+				{
+					drawSettings.overrideMaterial = overrideMaterial;
+				}
 
 				var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
 
