@@ -97,9 +97,9 @@ MonoBehaviour:
   - UniversalForward
   frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
-  resolveAlpha: 0
+  resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
-  debugAlpha: 1
+  debugAlpha: 0
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}
 --- !u!114 &338588822796687199
 MonoBehaviour:
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Outline
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   settings:
     passTag: Outline
     Event: 300

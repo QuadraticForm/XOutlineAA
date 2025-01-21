@@ -335,6 +335,9 @@
         },
         {
             "m_Id": "8a2bc24676ec463daca57332d4121ea1"
+        },
+        {
+            "m_Id": "6b8edd35333c4a0f9f5e84d5b80e9575"
         }
     ],
     "m_StickyNoteDatas": [
@@ -1451,17 +1454,17 @@
     "m_Type": "UnityEditor.ShaderGraph.SplitNode",
     "m_ObjectId": "021053428b3d4cbd89ee3b652a323255",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "6b8edd35333c4a0f9f5e84d5b80e9575"
     },
     "m_Name": "Split",
     "m_DrawState": {
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1191.5,
-            "y": -1061.5,
-            "width": 119.0,
-            "height": 149.00006103515626
+            "x": -1410.4998779296875,
+            "y": -1020.9999389648438,
+            "width": 118.9998779296875,
+            "height": 148.99993896484376
         }
     },
     "m_Slots": [
@@ -2848,8 +2851,8 @@
     "m_ObjectId": "339d6010780a470e99b54bf907e86011",
     "m_Title": "Screen Size",
     "m_Position": {
-        "x": -3196.000244140625,
-        "y": -630.5001220703125
+        "x": -3196.0,
+        "y": -630.5
     }
 }
 
@@ -3712,7 +3715,7 @@
     "m_Title": "Delta In Pixels",
     "m_Position": {
         "x": -2872.5,
-        "y": -794.5000610351563
+        "y": -794.5
     }
 }
 
@@ -4450,6 +4453,17 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.GroupData",
+    "m_ObjectId": "6b8edd35333c4a0f9f5e84d5b80e9575",
+    "m_Title": "TODO WRONG Now! should be ORIGINAL Screen POS!!!",
+    "m_Position": {
+        "x": -1617.4998779296875,
+        "y": -1079.4998779296875
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
     "m_ObjectId": "6d7320b6aef54529a7fa785ab021daf3",
     "m_Id": 1,
@@ -4784,7 +4798,7 @@
     "m_Title": "Coverage To Alpha",
     "m_Position": {
         "x": -1395.0,
-        "y": -449.50030517578127
+        "y": -449.5
     }
 }
 
@@ -5545,8 +5559,8 @@
     "m_ObjectId": "8d755fd8a6194f249f29d50cef686f6f",
     "m_Title": "Face Normal in View Space, only keep X Y, ",
     "m_Position": {
-        "x": -5947.00048828125,
-        "y": -1993.5001220703125
+        "x": -5947.0,
+        "y": -1993.5
     }
 }
 
@@ -6202,7 +6216,7 @@
     "m_ObjectId": "a0ecf5055f184ae99937968b93c7904c",
     "m_Title": "Original Screen Space Position",
     "m_Position": {
-        "x": -3936.000244140625,
+        "x": -3936.0,
         "y": -790.5
     }
 }
@@ -6501,7 +6515,7 @@
     "m_Title": "Offseted Position In View Space",
     "m_Position": {
         "x": -4437.5,
-        "y": -1006.0001220703125
+        "y": -1006.0
     }
 }
 
@@ -6770,7 +6784,7 @@
     "m_Title": "Offseted Screen Space Position",
     "m_Position": {
         "x": -3808.0,
-        "y": -1047.0001220703125
+        "y": -1047.0
     }
 }
 
@@ -7845,7 +7859,7 @@
     "m_Title": "View Relative Switch",
     "m_Position": {
         "x": -5621.0,
-        "y": -949.5001220703125
+        "y": -949.5
     }
 }
 
@@ -8608,7 +8622,7 @@
     "m_Title": "Screen Space Delta",
     "m_Position": {
         "x": -3348.0,
-        "y": -1006.0001220703125
+        "y": -1006.0
     }
 }
 
@@ -9132,7 +9146,7 @@
     "m_Title": "Thickness",
     "m_Position": {
         "x": -5630.5,
-        "y": -662.0001220703125
+        "y": -662.0
     }
 }
 
@@ -9232,17 +9246,17 @@
     "m_Type": "UnityEditor.ShaderGraph.ScreenPositionNode",
     "m_ObjectId": "fe90fbc859bb474689e318e3c03a0770",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "6b8edd35333c4a0f9f5e84d5b80e9575"
     },
     "m_Name": "Screen Position",
     "m_DrawState": {
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -1373.5,
-            "y": -1061.5,
-            "width": 145.0,
-            "height": 128.50006103515626
+            "x": -1592.4998779296875,
+            "y": -1020.9999389648438,
+            "width": 144.9998779296875,
+            "height": 128.49993896484376
         }
     },
     "m_Slots": [
