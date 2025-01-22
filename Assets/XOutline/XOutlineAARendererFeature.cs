@@ -89,12 +89,8 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 	{
 		renderer.EnqueuePass(frontNormalPass);
 		renderer.EnqueuePass(outlineGBufferPass);
-
-		if (resolveAlpha > 0.0001f)
-			renderer.EnqueuePass(resolvePass);
-
-		if (debugAlpha > 0.0001f)
-			renderer.EnqueuePass(debugPass);
+		renderer.EnqueuePass(resolvePass);
+		renderer.EnqueuePass(debugPass);
 	}
 
 	class XOutlineGBufferPass : ScriptableRenderPass
@@ -152,7 +148,7 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 
 				var textureProperties = cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
-				textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+				textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
 
 				if (createGBuffer)
 					rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer", false);
@@ -212,6 +208,9 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
 		{
+			if (postProcessMaterial == null || alpha < 0.000001)
+				return;
+
 			// get all sorts of data from the frame context
 
 			var resourcesData = frameContext.Get<UniversalResourceData>();
