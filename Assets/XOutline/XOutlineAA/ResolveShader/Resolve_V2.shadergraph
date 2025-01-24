@@ -222,6 +222,9 @@
     "m_StickyNoteDatas": [
         {
             "m_Id": "fb42c439e2f14a579941cb99affd5d29"
+        },
+        {
+            "m_Id": "89b5fb7e2f29416aa90cef99979995ab"
         }
     ],
     "m_Edges": [
@@ -755,20 +758,6 @@
                     "m_Id": "bac060ed4b774e8aa37ccad459ff2198"
                 },
                 "m_SlotId": 1144087040
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "9b4633fe0c4347fe99857d875093f13d"
-                },
-                "m_SlotId": 1
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "2dfc9d4c70f4442eb35800828954e7e3"
-                },
-                "m_SlotId": 62247496
             }
         },
         {
@@ -3095,10 +3084,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6205.5,
-            "y": 482.5000915527344,
+            "x": -6205.49951171875,
+            "y": 544.9999389648438,
             "width": 231.0,
-            "height": 118.99990844726563
+            "height": 119.00006103515625
         }
     },
     "m_Slots": [
@@ -3196,7 +3185,7 @@
     "m_ObjectId": "4ab4a1f8b8b5465eb50d31eda9e75098",
     "m_Title": "GBuffer Search, 9-pixel-block",
     "m_Position": {
-        "x": -6938.5,
+        "x": -6938.49951171875,
         "y": -295.0
     }
 }
@@ -4594,8 +4583,8 @@
     "m_ObjectId": "82ad532063de4e9ebf598ca172990427",
     "m_Title": "Front Normal Screen Pos",
     "m_Position": {
-        "x": -5332.0,
-        "y": 563.0
+        "x": -5331.99951171875,
+        "y": 563.000244140625
     }
 }
 
@@ -4835,6 +4824,26 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
+    "m_ObjectId": "89b5fb7e2f29416aa90cef99979995ab",
+    "m_Title": "TODO",
+    "m_Content": "1. 应该只考虑 5 pixel 邻域；\n2. 只处理 5-pixel 邻域既有 outline 像素，也有非 outline 像素的像素；\n3. Blur 不能用真正的 Blur，而应该采用跟 XXAA 类似的替代法；\n4. 想办法解决几乎完全 横/竖 的锯齿；",
+    "m_TextSize": 0,
+    "m_Theme": 0,
+    "m_Position": {
+        "serializedVersion": "2",
+        "x": -5804.0,
+        "y": -333.0,
+        "width": 406.0,
+        "height": 282.5
+    },
+    "m_Group": {
+        "m_Id": ""
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "8c673ca3fd8b465cba8652b60c16cf51",
     "m_Group": {
@@ -4845,10 +4854,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6205.5,
-            "y": 715.5001220703125,
+            "x": -6205.49951171875,
+            "y": 777.9998779296875,
             "width": 231.0,
-            "height": 118.99993896484375
+            "height": 119.0
         }
     },
     "m_Slots": [
@@ -4990,8 +4999,8 @@
     "m_ObjectId": "9170837bdb554dda99907a7eed3ff080",
     "m_Title": "Front Normal",
     "m_Position": {
-        "x": -4107.0,
-        "y": 507.5
+        "x": -4106.9990234375,
+        "y": 507.5000305175781
     }
 }
 
@@ -5241,7 +5250,7 @@
     "m_ObjectId": "9804384a1da04cb6af0ee590dfae29a1",
     "m_Title": "Outline Normal",
     "m_Position": {
-        "x": -5356.0,
+        "x": -5355.9990234375,
         "y": 158.5
     }
 }
@@ -5354,10 +5363,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6205.5,
-            "y": 363.5,
+            "x": -6205.49951171875,
+            "y": 426.0000305175781,
             "width": 231.0,
-            "height": 119.00009155273438
+            "height": 118.99990844726563
         }
     },
     "m_Slots": [
@@ -5792,7 +5801,7 @@
     "m_ObjectId": "a4ebf9aa05e44e4a9dd10ef7274ff0d7",
     "m_Title": "Outline Direction XY",
     "m_Position": {
-        "x": -3423.5,
+        "x": -3423.49951171875,
         "y": 154.5
     }
 }
@@ -5947,8 +5956,8 @@
     "m_ObjectId": "aacbe48b49f84e5dbf922096139589be",
     "m_Title": "Move 2 pixels more to ensure that it will sample on front face",
     "m_Position": {
-        "x": -5016.5,
-        "y": 367.0
+        "x": -5016.4990234375,
+        "y": 367.0002746582031
     }
 }
 
@@ -6601,8 +6610,8 @@
     "m_ObjectId": "c6c9d13e755c46bbae0e70425de13179",
     "m_Title": "mul by radius",
     "m_Position": {
-        "x": -2778.0,
-        "y": 95.0
+        "x": -2777.9990234375,
+        "y": 95.00001525878906
     }
 }
 
@@ -6970,10 +6979,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6205.5,
-            "y": 601.5,
+            "x": -6205.49951171875,
+            "y": 664.0,
             "width": 231.0,
-            "height": 119.0001220703125
+            "height": 119.0
         }
     },
     "m_Slots": [
@@ -7401,8 +7410,8 @@
     "m_ObjectId": "e8ff9c2bf67b4460b7cbf568fda548f0",
     "m_Title": "Search Result",
     "m_Position": {
-        "x": -5746.5,
-        "y": 205.0
+        "x": -5746.4990234375,
+        "y": 205.00001525878907
     }
 }
 

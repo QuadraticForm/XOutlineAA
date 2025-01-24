@@ -4,11 +4,10 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - gbufferMaterial: {fileID: 2100000, guid: 96003ba25bc300e42a2125b20506fe4d, type: 2}
-  - resolveMaterial: {fileID: -876546973899608171, guid: ad548c585d661df4fb57e0018d335339,
-      type: 3}
-  - debugMaterial: {fileID: -876546973899608171, guid: 3af29130d5f4a624986da09de244cfba,
-      type: 3}
+  - frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
+  - outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
+  - resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  - debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
