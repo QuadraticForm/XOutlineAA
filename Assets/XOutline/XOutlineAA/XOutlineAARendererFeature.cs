@@ -60,7 +60,8 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 	#region Shared Fields
 
 	// Shared gbuffer texture
-	private TextureHandle gbuffer = TextureHandle.nullHandle;
+	private TextureHandle gbuffer1 = TextureHandle.nullHandle;
+	private TextureHandle gbuffer2 = TextureHandle.nullHandle;
 
 	#endregion
 
@@ -146,18 +147,28 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 
 				// create render target
 
-				var textureProperties = cameraData.cameraTargetDescriptor;
-				textureProperties.depthBufferBits = 0;
-				textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
+				
 
 				if (createGBuffer)
-					rendererFeature.gbuffer = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer", false);
+				{
+					var textureProperties = cameraData.cameraTargetDescriptor;
+					textureProperties.depthBufferBits = 0;
+					textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
+					// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+
+					rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
+
+					textureProperties.colorFormat = RenderTextureFormat.RGHalf;
+
+					rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
+				}
 
 				// actual build render graph
 
 				builder.AllowGlobalStateModification(true);
 
-				builder.SetRenderAttachment(rendererFeature.gbuffer, 0);
+				builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
+				builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
 				builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 				builder.UseRendererList(passData.rendererListHandle);
 
@@ -166,7 +177,9 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 1);
 
 					if (clearGBuffer)
+					{
 						context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+					}
 
 					context.cmd.DrawRendererList(data.rendererListHandle);
 
@@ -189,6 +202,7 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 			public TextureHandle cameraColorCopy;
 			public TextureHandle cameraDepth;
 			public TextureHandle gbuffer;
+			public TextureHandle gbuffer2;
 
 			public TextureHandle destination;
 		}
@@ -247,12 +261,14 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 			{
 				passData.cameraColorCopy = cameraColorCopy;
 				passData.cameraDepth = resourcesData.cameraDepthTexture;
-				passData.gbuffer = rendererFeature.gbuffer;
+				passData.gbuffer = rendererFeature.gbuffer1;
+				passData.gbuffer2 = rendererFeature.gbuffer2;
 				passData.destination = resourcesData.activeColorTexture;
 
 				builder.UseTexture(passData.cameraColorCopy);
 				builder.UseTexture(passData.cameraDepth);
 				builder.UseTexture(passData.gbuffer);
+				builder.UseTexture(passData.gbuffer2);
 				builder.SetRenderAttachment(passData.destination, 0);
 
 				builder.SetRenderFunc((MainPassData data, RasterGraphContext context) =>
@@ -260,6 +276,7 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 					propertyBlock.SetTexture("_CameraColorCopy", data.cameraColorCopy);
 					propertyBlock.SetTexture("_CameraDepthCopy", data.cameraDepth); // "_CameraDepthTexture" is in use by unity, so I just use "_CameraDepthCopy" instead
 					propertyBlock.SetTexture("_GBuffer", data.gbuffer);
+					propertyBlock.SetTexture("_GBuffer2", data.gbuffer2);
 					propertyBlock.SetFloat("_Alpha", alpha);
 
 					// var material = rendererFeature.debugGBufferAlpha > 0.01f ? rendererFeature.debugMaterial : rendererFeature.resolveMaterial;

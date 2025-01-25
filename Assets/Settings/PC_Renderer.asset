@@ -36,7 +36,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcf51b1d61f847645860087161dee28b, type: 3}
   m_Name: XOutlineAARendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   layerMask:
     serializedVersion: 2
     m_Bits: 8192

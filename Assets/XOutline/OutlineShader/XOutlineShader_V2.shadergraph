@@ -2289,7 +2289,7 @@
     "m_Title": "Original Screen Pos",
     "m_Position": {
         "x": -2054.0,
-        "y": -195.999755859375
+        "y": -196.0
     }
 }
 
@@ -2483,8 +2483,8 @@
     "m_ObjectId": "2c878ee9f71146b4b22071378fb70b5f",
     "m_Title": "Output",
     "m_Position": {
-        "x": -782.0,
-        "y": -283.5000915527344
+        "x": -781.9999389648438,
+        "y": -283.4999084472656
     }
 }
 
@@ -2667,8 +2667,8 @@
     "m_ObjectId": "339d6010780a470e99b54bf907e86011",
     "m_Title": "Screen Size",
     "m_Position": {
-        "x": -3794.499755859375,
-        "y": -627.4998168945313
+        "x": -3794.5,
+        "y": -627.5
     }
 }
 
@@ -2893,7 +2893,7 @@
     "m_Title": "GBuffer Mode Output",
     "m_Position": {
         "x": -1435.5,
-        "y": -423.499755859375
+        "y": -423.50006103515627
     }
 }
 
@@ -3301,7 +3301,7 @@
     "m_ObjectId": "500df105fff94af58611c73f72d697fa",
     "m_Title": "Merged Normal",
     "m_Position": {
-        "x": -6600.0,
+        "x": -6600.00048828125,
         "y": -1247.0
     }
 }
@@ -3943,7 +3943,7 @@
     "m_Title": "Shading Pass Output",
     "m_Position": {
         "x": -1568.5,
-        "y": 96.00050354003906
+        "y": 96.0
     }
 }
 
@@ -4323,8 +4323,8 @@
     "m_ObjectId": "76cb55656e0744729f0195c725513ab5",
     "m_Title": "Coverage To Alpha",
     "m_Position": {
-        "x": -2220.000244140625,
-        "y": 215.5
+        "x": -2220.0,
+        "y": 215.4998016357422
     }
 }
 
@@ -5216,7 +5216,7 @@
     "m_Title": "Normal in View Space, only keep X Y",
     "m_Position": {
         "x": -5957.0,
-        "y": -1197.999755859375
+        "y": -1198.0
     }
 }
 
@@ -5265,7 +5265,7 @@
     "m_Title": "View Relative Thickness",
     "m_Position": {
         "x": -5882.0,
-        "y": -865.999755859375
+        "y": -866.0
     }
 }
 
@@ -5581,8 +5581,8 @@
     "m_ObjectId": "a0ecf5055f184ae99937968b93c7904c",
     "m_Title": "Original Screen Space Position",
     "m_Position": {
-        "x": -4539.49951171875,
-        "y": -756.5001220703125
+        "x": -4539.5,
+        "y": -756.4999389648438
     }
 }
 
@@ -5912,7 +5912,7 @@
     "m_ObjectId": "b7840f44db7c4b8e9db94093ebd8b529",
     "m_Title": "Offseted Screen Space Position",
     "m_Position": {
-        "x": -4411.99951171875,
+        "x": -4412.0,
         "y": -1012.0
     }
 }
@@ -6712,8 +6712,8 @@
     "m_ObjectId": "cf5cb4d8dfba49aab51579a6c721eb8c",
     "m_Title": "View Relative Switch",
     "m_Position": {
-        "x": -6351.0,
-        "y": -959.499755859375
+        "x": -6351.00048828125,
+        "y": -959.5
     }
 }
 
@@ -7608,8 +7608,8 @@
     "m_ObjectId": "f0f60c35a76b42269ce98dee0769a1d1",
     "m_Title": "Outline Normal, Flipped to face camera",
     "m_Position": {
-        "x": -2022.5,
-        "y": -423.499755859375
+        "x": -2022.4998779296875,
+        "y": -423.50006103515627
     }
 }
 
