@@ -109,26 +109,43 @@ Shader "Unlit/XOutlineShader_V3"
                 return offset_normal_vs;
             }
 
-            void EnsureMinimumThicknessInPixels(inout float4 pos_cs, float4 pos_cs_original, out float alpha)
+            void AdjustPosCS(inout float4 pos_cs, inout float4 pos_cs_original, out float alpha)
             {
                 float scale_factor = 1;
 
-                if (_MinThicknessInPixels > 0.001)
-                {
-                    float2 pos_ndc_original = pos_cs_original.xy / pos_cs_original.w;
-                    float2 pos_ndc = pos_cs.xy / pos_cs.w;
+				//
+				// move pos_cs, to ensure minimum thickness in pixels
+				//
 
-                    float2 offset_ndc = pos_ndc - pos_ndc_original;
-                    float2 offset_in_pixels = offset_ndc * _ScreenParams.xy * 0.5; // ndc is 2 times larger than screen space, so * 0.5
+				//// pixel offset need to be calculated with NDC pos
 
-                    scale_factor = max(1, _MinThicknessInPixels / MaxElementVec2(abs(offset_in_pixels)));
+                float2 pos_ndc_original = pos_cs_original.xy / pos_cs_original.w;
+                float2 pos_ndc = pos_cs.xy / pos_cs.w;
 
-                    pos_ndc = pos_ndc_original + offset_ndc * scale_factor;
+                float2 offset_ndc = pos_ndc - pos_ndc_original;
+                float2 offset_in_pixels = offset_ndc * _ScreenParams.xy * 0.5; // ndc is 2 times larger than screen space, so * 0.5
 
-                    pos_cs.xy = pos_ndc.xy * pos_cs.w;
-                }
+				float major_offset_in_pixels = MaxElementVec2(abs(offset_in_pixels));
+                scale_factor = max(1, _MinThicknessInPixels / major_offset_in_pixels);
+
+                pos_ndc = pos_ndc_original + offset_ndc * scale_factor;
+
+				//// convert back to clip space position
+
+                pos_cs.xy = pos_ndc.xy * pos_cs.w;
+
+				// Coverage To Alpha
 
                 alpha = _CoverageToAlpha > 0.5f ? 1 / scale_factor : 1;
+
+				// move "original" inward 1 pixel, so in resolve pass, with original_position_ss, 
+				// we are garrenteed to sample the "Front Normal", instead of the "Outline Normal"
+
+				scale_factor = -1 / major_offset_in_pixels;
+
+				pos_ndc_original += offset_ndc * scale_factor;
+
+				pos_cs_original.xy = pos_ndc_original.xy * pos_cs_original.w;
             }
 
             v2f vert (appdata v)
@@ -157,11 +174,14 @@ Shader "Unlit/XOutlineShader_V3"
 
                 float alpha = 1;
 
-                EnsureMinimumThicknessInPixels(pos_cs, pos_cs_original, alpha);
+                AdjustPosCS(pos_cs, pos_cs_original, alpha);
 
                 // output to fragment shader
 
                 o.vertex = pos_cs;
+
+				o.normalAndAlpha.xyz = shading_normal_vs;
+                o.normalAndAlpha.w = alpha;
 
                 o.original_position_ss = pos_cs_original.xy / pos_cs_original.w * 0.5 + 0.5;
                 #if UNITY_UV_STARTS_AT_TOP
@@ -169,9 +189,6 @@ Shader "Unlit/XOutlineShader_V3"
                 #endif
 
                 // o.original_position_ss = ComputeScreenPos(pos_cs_original / pos_cs_original.w); // the unity doc is wrong, it told us that this function's input is in clip space, but actually it's NDC(that's clip space / w)
-                
-                o.normalAndAlpha.xyz = shading_normal_vs;
-                o.normalAndAlpha.w = alpha;
 
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;

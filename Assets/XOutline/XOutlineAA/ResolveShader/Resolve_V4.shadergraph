@@ -2475,8 +2475,8 @@
     "m_ObjectId": "2e739efe99cd4034ab94251128ed5a90",
     "m_Title": "Directional Blur",
     "m_Position": {
-        "x": -1132.500244140625,
-        "y": -165.00015258789063
+        "x": -1132.5,
+        "y": -165.0
     }
 }
 
@@ -4359,7 +4359,7 @@
     "m_ObjectId": "6f7ea46279ac448abafa87c1fca075b5",
     "m_Title": "+Dir and -Dir",
     "m_Position": {
-        "x": -1514.5003662109375,
+        "x": -1514.5,
         "y": 199.0
     }
 }
@@ -4394,7 +4394,7 @@
     "m_ObjectId": "739880ed4b6847b4ac25c47f31913de8",
     "m_Title": "Outline Direction View Space",
     "m_Position": {
-        "x": -6235.00048828125,
+        "x": -6235.0,
         "y": 313.0
     }
 }
@@ -4479,8 +4479,8 @@
     "m_ObjectId": "78076d93fd7b44c8847846cc03610e19",
     "m_Title": "Different Blur Radius For Diagonal Or Flat(mostly horizontal or vertical)",
     "m_Position": {
-        "x": -3980.00048828125,
-        "y": 459.9998474121094
+        "x": -3980.0,
+        "y": 460.0
     }
 }
 
@@ -5827,8 +5827,8 @@
     "m_ObjectId": "a3b0e81709db4289beb8f8159fab1cd8",
     "m_Title": "Outline Direction Screen Space",
     "m_Position": {
-        "x": -5388.50048828125,
-        "y": 96.99996185302735
+        "x": -5388.5,
+        "y": 97.0
     }
 }
 
@@ -6719,8 +6719,8 @@
     "m_ObjectId": "c6c9d13e755c46bbae0e70425de13179",
     "m_Title": "mul by radius",
     "m_Position": {
-        "x": -2361.000244140625,
-        "y": 242.99984741210938
+        "x": -2361.0,
+        "y": 243.0
     }
 }
 
