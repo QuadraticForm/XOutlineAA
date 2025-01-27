@@ -206,7 +206,7 @@ Shader "Unlit/XOutlineShader_V3"
                 FragmentOutput fragOut;
 
                 fragOut.dest0 = 0;
-                fragOut.dest1 = float4(1,1,1,1);
+                fragOut.dest1 = 0;
 
                 // is gbuffer pass
                 if (_IsGBufferPass > 0.5)
@@ -214,16 +214,10 @@ Shader "Unlit/XOutlineShader_V3"
                     fragOut.dest0.rg = normalize(i.normalAndAlpha.xyz).xy; 
                     fragOut.dest0.ba = i.original_position_ss.xy;
 
-                    // calculate blur distance by ddx and ddy of normal,
-                    // the slower the normal changes, the larger the blur radius
+                    // test dest1
 
-                    float3 ddx_normal = ddx(i.normalAndAlpha.xyz);
-                    float3 ddy_normal = ddy(i.normalAndAlpha.xyz);
-
-                    float normal_variation = max(length(ddx_normal), length(ddy_normal));
-                    float blurRadius = lerp(_LongEdgeBlurRadiusMul * _BlurRadius, _BlurRadius, saturate(normal_variation));
-
-                    fragOut.dest1.r = normal_variation;
+					fragOut.dest1.rgb = _Color.rgb;
+					fragOut.dest1.a = i.normalAndAlpha.w;
                 }
                 // is shading pass
                 else

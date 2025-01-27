@@ -21,11 +21,11 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 
 	private List<ShaderTagId> shaderTagIdList;
 
-	XOutlineGBufferPass frontNormalPass;
+	XOutlineDrawFrontNormalPass frontNormalPass;
 
 	public Material frontNormalMaterial;
 
-	XOutlineGBufferPass outlineGBufferPass;
+	XOutlineDrawOutlinePass outlineGBufferPass;
 
 	public Material outlineMaterial;
 
@@ -73,10 +73,10 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 			shaderTagIdList.Add(new ShaderTagId(passName));
 		}
 
-		frontNormalPass = new XOutlineGBufferPass(this, frontNormalMaterial, clearGBuffer: true, createGBuffer: true);
+		frontNormalPass = new XOutlineDrawFrontNormalPass(this, frontNormalMaterial, clearGBuffer: true, createGBuffer: true);
 		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
-		outlineGBufferPass = new XOutlineGBufferPass(this, outlineMaterial, clearGBuffer: false, createGBuffer: false);
+		outlineGBufferPass = new XOutlineDrawOutlinePass(this, outlineMaterial, clearGBuffer: false, createGBuffer: false);
 		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
@@ -94,7 +94,7 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 		renderer.EnqueuePass(debugPass);
 	}
 
-	class XOutlineGBufferPass : ScriptableRenderPass
+	class XOutlineDrawObjectsPass : ScriptableRenderPass
 	{
 		private XOutlineAARendererFeature rendererFeature;
 		private Material overrideMaterial;
@@ -106,17 +106,75 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 			public static readonly int IsGBufferPass = Shader.PropertyToID("_IsGBufferPass");
 		}
 
-		private class PassData
+		// XX: is this really necessary?
+		protected class PassData
 		{
 			public RendererListHandle rendererListHandle;
 		}
 
-		public XOutlineGBufferPass(XOutlineAARendererFeature rendererFeature, Material overrideMaterial = null, bool clearGBuffer = false, bool createGBuffer = false)
+		public XOutlineDrawObjectsPass(XOutlineAARendererFeature rendererFeature, Material overrideMaterial = null, bool clearGBuffer = false, bool createGBuffer = false)
 		{
 			this.rendererFeature = rendererFeature;
 			this.overrideMaterial = overrideMaterial;
 			this.clearGBuffer = clearGBuffer;
 			this.createGBuffer = createGBuffer;
+		}
+
+		protected virtual void CreateRendererList(RenderGraph renderGraph, PassData passData, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+		{
+			var sortFlags = cameraData.defaultOpaqueSortFlags;
+			var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
+
+			if (overrideMaterial != null)
+			{
+				drawSettings.overrideMaterial = overrideMaterial;
+			}
+
+			var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
+
+			var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
+			passData.rendererListHandle = renderGraph.CreateRendererList(rendererListParameters);
+		}
+
+		protected virtual void CreateRenderTargets(RenderGraph renderGraph, UniversalCameraData cameraData)
+		{
+			if (createGBuffer)
+			{
+				var textureProperties = cameraData.cameraTargetDescriptor;
+				textureProperties.depthBufferBits = 0;
+				textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
+				// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+
+				rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
+
+				textureProperties.colorFormat = RenderTextureFormat.ARGB32;
+
+				rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
+			}
+		}
+
+		protected virtual void SetupRenderGraph(IRasterRenderGraphBuilder builder, PassData passData, UniversalResourceData resourceData)
+		{
+			builder.AllowGlobalStateModification(true);
+
+			builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
+			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
+			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
+			builder.UseRendererList(passData.rendererListHandle);
+
+			builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+			{
+				context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 1);
+
+				if (clearGBuffer)
+				{
+					context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+				}
+
+				context.cmd.DrawRendererList(data.rendererListHandle);
+
+				context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 0);
+			});
 		}
 
 		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
@@ -132,60 +190,72 @@ public class XOutlineAARendererFeature : ScriptableRendererFeature
 
 				// create renderer list
 
-				var sortFlags = cameraData.defaultOpaqueSortFlags;
-				var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
-
-				if (overrideMaterial != null)
-				{
-					drawSettings.overrideMaterial = overrideMaterial;
-				}
-
-				var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
-
-				var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
-				passData.rendererListHandle = renderGraph.CreateRendererList(rendererListParameters);
+				CreateRendererList(renderGraph, passData, renderingData, cameraData, lightData);
 
 				// create render target
 
-				
-
-				if (createGBuffer)
-				{
-					var textureProperties = cameraData.cameraTargetDescriptor;
-					textureProperties.depthBufferBits = 0;
-					textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
-					// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
-
-					rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
-
-					textureProperties.colorFormat = RenderTextureFormat.RGHalf;
-
-					rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
-				}
+				CreateRenderTargets(renderGraph, cameraData);
 
 				// actual build render graph
 
-				builder.AllowGlobalStateModification(true);
-
-				builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-				builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
-				builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
-				builder.UseRendererList(passData.rendererListHandle);
-
-				builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
-				{
-					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 1);
-
-					if (clearGBuffer)
-					{
-						context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
-					}
-
-					context.cmd.DrawRendererList(data.rendererListHandle);
-
-					context.cmd.SetGlobalFloat(ShaderPropertyId.IsGBufferPass, 0);
-				});
+				SetupRenderGraph(builder, passData, resourceData);
 			}
+		}
+	}
+
+	class XOutlineDrawFrontNormalPass : XOutlineDrawObjectsPass
+	{
+		public XOutlineDrawFrontNormalPass(XOutlineAARendererFeature rendererFeature, Material overrideMaterial = null, bool clearGBuffer = false, bool createGBuffer = false)
+			: base(rendererFeature, overrideMaterial, clearGBuffer, createGBuffer)
+		{
+		}
+
+		protected override void CreateRendererList(RenderGraph renderGraph, PassData passData, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+		{
+			base.CreateRendererList(renderGraph, passData, renderingData, cameraData, lightData);
+		}
+
+		protected override void CreateRenderTargets(RenderGraph renderGraph, UniversalCameraData cameraData)
+		{
+			base.CreateRenderTargets(renderGraph, cameraData);
+		}
+
+		protected override void SetupRenderGraph(IRasterRenderGraphBuilder builder, PassData passData, UniversalResourceData resourceData)
+		{
+			base.SetupRenderGraph(builder, passData, resourceData);
+		}
+
+		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+		{
+			base.RecordRenderGraph(renderGraph, frameContext);
+		}
+	}
+
+	class XOutlineDrawOutlinePass : XOutlineDrawObjectsPass
+	{
+		public XOutlineDrawOutlinePass(XOutlineAARendererFeature rendererFeature, Material overrideMaterial = null, bool clearGBuffer = false, bool createGBuffer = false)
+			: base(rendererFeature, overrideMaterial, clearGBuffer, createGBuffer)
+		{
+		}
+
+		protected override void CreateRendererList(RenderGraph renderGraph, PassData passData, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+		{
+			base.CreateRendererList(renderGraph, passData, renderingData, cameraData, lightData);
+		}
+
+		protected override void CreateRenderTargets(RenderGraph renderGraph, UniversalCameraData cameraData)
+		{
+			base.CreateRenderTargets(renderGraph, cameraData);
+		}
+
+		protected override void SetupRenderGraph(IRasterRenderGraphBuilder builder, PassData passData, UniversalResourceData resourceData)
+		{
+			base.SetupRenderGraph(builder, passData, resourceData);
+		}
+
+		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+		{
+			base.RecordRenderGraph(renderGraph, frameContext);
 		}
 	}
 

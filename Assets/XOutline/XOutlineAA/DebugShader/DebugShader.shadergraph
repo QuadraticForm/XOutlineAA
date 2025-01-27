@@ -307,13 +307,13 @@
                 "m_Node": {
                     "m_Id": "e5b6da63f7bf419eb95d8d8054515507"
                 },
-                "m_SlotId": 4
+                "m_SlotId": 0
             },
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "ec23ae661635442386a3d1615a547ac3"
                 },
-                "m_SlotId": 5
+                "m_SlotId": 1
             }
         },
         {
@@ -321,7 +321,7 @@
                 "m_Node": {
                     "m_Id": "e5b6da63f7bf419eb95d8d8054515507"
                 },
-                "m_SlotId": 5
+                "m_SlotId": 7
             },
             "m_InputSlot": {
                 "m_Node": {
@@ -713,9 +713,9 @@
             "referenceName": "ORIGINALSCREENPOS"
         },
         {
-            "id": 5,
-            "displayName": "Radius",
-            "referenceName": "RADIUS"
+            "id": 1,
+            "displayName": "Color",
+            "referenceName": "COLOR"
         },
         {
             "id": 3,
@@ -2050,30 +2050,6 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
-    "m_ObjectId": "c3aaedb8c9a24e5ab5470ad0e66cd379",
-    "m_Id": 5,
-    "m_DisplayName": "Radius",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "RADIUS",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
     "m_ObjectId": "c5ecbcbfea9c49169b26f75bbe8895fd",
     "m_Id": 0,
     "m_DisplayName": "Out",
@@ -2344,6 +2320,30 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
+    "m_ObjectId": "e44c9ca6f86f4eb69fbe356e0feaad19",
+    "m_Id": 1,
+    "m_DisplayName": "Color",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "COLOR",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicValueMaterialSlot",
     "m_ObjectId": "e49eee2ba9234b0c99d5db89f09dd4ad",
     "m_Id": 2,
@@ -2496,7 +2496,7 @@
             "m_Id": "74a35409d4874e3db6d2d3f00def61f9"
         },
         {
-            "m_Id": "c3aaedb8c9a24e5ab5470ad0e66cd379"
+            "m_Id": "e44c9ca6f86f4eb69fbe356e0feaad19"
         },
         {
             "m_Id": "dc95db7459c74daaa4161491a02200b5"
