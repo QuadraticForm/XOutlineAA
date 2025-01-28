@@ -19,6 +19,7 @@ MonoBehaviour:
   shaderTagNameList:
   - UniversalForward
   - UniversalGBuffer
+  gbufferPrecision: 1
   frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
   resolveEnabled: 1
@@ -123,6 +124,7 @@ MonoBehaviour:
     m_Bits: 9216
   shaderTagNameList:
   - UniversalForward
+  gbufferPrecision: 1
   frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
   resolveEnabled: 1

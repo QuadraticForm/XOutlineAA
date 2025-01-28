@@ -10,7 +10,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 {
 	#region Shared Fields
 
-	[Header("Objects")]
+	[Header("Common")]
 
 	public LayerMask layerMask = 0;
 
@@ -22,6 +22,15 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	};
 
 	private List<ShaderTagId> shaderTagIdList;
+
+	public enum GBufferPrecision
+	{
+		Float,
+		Half,
+	}
+
+	[Space]
+	public GBufferPrecision gbufferPrecision = GBufferPrecision.Half;
 
 	// Shared gbuffer texture
 	private TextureHandle gbuffer1 = TextureHandle.nullHandle;
@@ -136,8 +145,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 				// create gbuffer 1
 
-				textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
-				// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+				if (rendererFeature.gbufferPrecision == GBufferPrecision.Half)
+					textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+				else
+					textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
 
 				rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
 
