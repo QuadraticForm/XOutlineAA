@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
+using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
@@ -25,6 +26,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	// Shared gbuffer texture
 	private TextureHandle gbuffer1 = TextureHandle.nullHandle;
 	private TextureHandle gbuffer2 = TextureHandle.nullHandle;
+
+	XOutlinePreparePass preparePass;
 
 	#endregion
 
@@ -80,11 +83,14 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			shaderTagIdList.Add(new ShaderTagId(passName));
 		}
 
-		frontNormalPass = new XOutlineFrontNormalPass(this, "XOutline Front Normal Pass", frontNormalMaterial);
-		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+		preparePass = new XOutlinePreparePass(this);
+		preparePass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
 		outlineGBufferPass = new XOutlineOutlinePass(this, "XOutline Outline Pass", outlineMaterial);
-		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
+
+		frontNormalPass = new XOutlineFrontNormalPass(this, "XOutline Front Normal Pass", frontNormalMaterial);
+		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
 		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
@@ -95,11 +101,57 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
-		renderer.EnqueuePass(frontNormalPass);
+		renderer.EnqueuePass(preparePass);
 		renderer.EnqueuePass(outlineGBufferPass);
+		renderer.EnqueuePass(frontNormalPass);
 		renderer.EnqueuePass(resolvePass);
 		renderer.EnqueuePass(debugPass);
 	}
+
+	class XOutlinePreparePass : ScriptableRenderPass
+	{ 
+		protected XOutlineRendererFeature rendererFeature;
+
+		public XOutlinePreparePass(XOutlineRendererFeature rendererFeature)
+		{
+			this.rendererFeature = rendererFeature;
+		}
+
+		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+		{
+			using (var builder = renderGraph.AddRasterRenderPass<object>("XOutline Prepare GBuffer", out var emptyPassData))
+			{
+				var cameraData = frameContext.Get<UniversalCameraData>();
+
+				var textureProperties = cameraData.cameraTargetDescriptor;
+				textureProperties.depthBufferBits = 0;
+
+				// create gbuffer 1
+
+				textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
+				// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+
+				rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
+
+				// create gbuffer 2
+
+				textureProperties.colorFormat = RenderTextureFormat.ARGB32;
+
+				rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
+
+				// clear them
+
+				builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
+				builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
+
+				builder.SetRenderFunc((object passData, RasterGraphContext context) =>
+				{
+					context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+				});
+			}
+		}
+	}
+
 
 	class XOutlineDrawObjectsPass : ScriptableRenderPass
 	{
@@ -177,53 +229,6 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		}
 	}
 
-	// Renders the view space normals of the front faces of objects
-	// this pass can be skipped if the pipeline already has a normal pass
-	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
-	{
-		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
-			: base(rendererFeature, name, overrideMaterial)
-		{
-		}
-
-		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
-		{
-			var textureProperties = cameraData.cameraTargetDescriptor;
-			textureProperties.depthBufferBits = 0;
-
-			// create gbuffer 1
-
-			textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
-			// textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
-
-			rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
-
-			// create gbuffer 2
-
-			textureProperties.colorFormat = RenderTextureFormat.ARGB32;
-
-			rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
-
-			// use them
-
-			builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
-			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
-		}
-
-		protected override void SetRenderFunc(IRasterRenderGraphBuilder builder)
-		{
-			builder.UseRendererList(rendererListHandle);
-
-			builder.SetRenderFunc((object passData, RasterGraphContext context) =>
-			{
-				context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
-
-				context.cmd.DrawRendererList(rendererListHandle);
-			});
-		}
-	}
-
 	class XOutlineOutlinePass : XOutlineDrawObjectsPass
 	{
 		public XOutlineOutlinePass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
@@ -236,6 +241,34 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
 			builder.SetRenderAttachment(rendererFeature.gbuffer1, 1);
 			builder.SetRenderAttachment(rendererFeature.gbuffer2, 2);
+
+			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
+		}
+
+		protected override void SetRenderFunc(IRasterRenderGraphBuilder builder)
+		{
+			builder.UseRendererList(rendererListHandle);
+
+			builder.SetRenderFunc((object passData, RasterGraphContext context) =>
+			{
+				context.cmd.DrawRendererList(rendererListHandle);
+			});
+		}
+	}
+
+	// Renders the view space normals of the front faces of objects
+	// this pass can be skipped if the pipeline already has a normal pass
+	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
+	{
+		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
+			: base(rendererFeature, name, overrideMaterial)
+		{
+		}
+
+		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
+		{
+			builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
+			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
 			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 		}
 

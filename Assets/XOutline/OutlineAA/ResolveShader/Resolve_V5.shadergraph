@@ -304,6 +304,9 @@
         },
         {
             "m_Id": "ef830bab7c284ac7a0d453a03d917229"
+        },
+        {
+            "m_Id": "de42e609e6844245a1cd69b9da940645"
         }
     ],
     "m_StickyNoteDatas": [
@@ -2289,7 +2292,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "09f35755c26248d397e0780c92cf2c25",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "PassOutlineGBufferPixel",
     "m_DrawState": {
@@ -7231,7 +7234,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "739ea5247845409998587d9ca728939f",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "PassOutlineGBufferPixel",
     "m_DrawState": {
@@ -7487,7 +7490,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "790f3093940d4768bf2aeb43d9209ab6",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "PassOutlineGBufferPixel",
     "m_DrawState": {
@@ -8630,7 +8633,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "906aca06baa2434ba3d6b4caa915b3d9",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "XAdjPixelSample5",
     "m_DrawState": {
@@ -10681,7 +10684,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "bafe4de1c7a84387aa3fc3c43dbb0ab5",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "PassOutlineGBufferPixel",
     "m_DrawState": {
@@ -11045,7 +11048,7 @@
     "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
     "m_ObjectId": "c58b2fc663c64a6daa13db56cae8741f",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "PassOutlineGBufferPixel",
     "m_DrawState": {
@@ -11516,7 +11519,7 @@
     "m_Type": "UnityEditor.ShaderGraph.ScreenPositionNode",
     "m_ObjectId": "d3287b4e0f564abdb9fff6e759160161",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "Screen Position",
     "m_DrawState": {
@@ -11718,10 +11721,21 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.GroupData",
+    "m_ObjectId": "de42e609e6844245a1cd69b9da940645",
+    "m_Title": "GBuffer Search",
+    "m_Position": {
+        "x": -7160.0,
+        "y": -66.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
     "m_ObjectId": "de7ac1ef48a7473d896afc896f1709fc",
     "m_Group": {
-        "m_Id": ""
+        "m_Id": "de42e609e6844245a1cd69b9da940645"
     },
     "m_Name": "Property",
     "m_DrawState": {
