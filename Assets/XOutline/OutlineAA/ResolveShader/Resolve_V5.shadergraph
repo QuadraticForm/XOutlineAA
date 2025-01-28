@@ -2826,10 +2826,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6700.49951171875,
-            "y": -539.0000610351563,
+            "x": -8214.5009765625,
+            "y": -613.0,
             "width": 214.5,
-            "height": 191.0
+            "height": 190.99996948242188
         }
     },
     "m_Slots": [
@@ -3123,10 +3123,10 @@
         "m_Expanded": false,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6366.50048828125,
-            "y": -539.0,
-            "width": 270.50048828125,
-            "height": 311.0
+            "x": -7880.5009765625,
+            "y": -613.0,
+            "width": 220.0,
+            "height": 190.99996948242188
         }
     },
     "m_Slots": [
@@ -3342,10 +3342,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6971.49951171875,
-            "y": -539.0000610351563,
+            "x": -8485.5009765625,
+            "y": -613.0,
             "width": 114.0,
-            "height": 34.000030517578128
+            "height": 33.99993896484375
         }
     },
     "m_Slots": [
@@ -4016,10 +4016,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 807.9999389648438,
-            "y": 1285.4998779296875,
+            "x": 768.0001220703125,
+            "y": -466.00006103515627,
             "width": 165.99993896484376,
-            "height": 95.0001220703125
+            "height": 94.999755859375
         }
     },
     "m_Slots": [
@@ -9109,10 +9109,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6422.50048828125,
-            "y": 1299.0,
+            "x": -6488.0,
+            "y": -421.99993896484377,
             "width": 56.0,
-            "height": 24.0
+            "height": 24.000030517578126
         }
     },
     "m_Slots": [
@@ -9158,10 +9158,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -7002.49951171875,
-            "y": -505.0000305175781,
+            "x": -8516.5009765625,
+            "y": -579.0000610351563,
             "width": 145.0,
-            "height": 128.5
+            "height": 128.50003051757813
         }
     },
     "m_Slots": [
@@ -10102,16 +10102,16 @@
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
     "m_ObjectId": "ae32ebc56551466fb23bf1e1927414c1",
-    "m_Title": "Why not edge only?",
-    "m_Content": "If we are only processing edge,\n(pixels that in its 5-pixel block, there are both outline and non-outline pixels)\n\nwe'll need extremly precise blur radius for different direction,\na large radius will result in steps between inner outline pixel and edge outline pixel\n",
+    "m_Title": "Why not resolve on edge only?",
+    "m_Content": "If we only process edge pixels,\n(pixels that in its adj 5-pixel block, have both outline and non-outline pixels)\n\nsince inner pixels on the outline is not processed,\nwe'll need extremly precise blur radius for edge pixels.\n\nsmall value won't solve stepping, \nlarger value creates new stepping between edge and non-edge pixels.\n\nappropriate blur radius is relative to outline direction \nand is very hard to calculate (at least I don't know how).\n",
     "m_TextSize": 0,
     "m_Theme": 0,
     "m_Position": {
         "serializedVersion": "2",
-        "x": -6090.0,
-        "y": -513.5,
-        "width": 355.0,
-        "height": 139.0
+        "x": -7581.5,
+        "y": -614.5,
+        "width": 435.5,
+        "height": 193.5
     },
     "m_Group": {
         "m_Id": ""
@@ -12239,10 +12239,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -6001.49951171875,
-            "y": -59.50004196166992,
+            "x": -7515.5009765625,
+            "y": -133.49998474121095,
             "width": 56.0,
-            "height": 23.99997329711914
+            "height": 23.999984741210939
         }
     },
     "m_Slots": [
@@ -12934,8 +12934,8 @@
     "m_Theme": 0,
     "m_Position": {
         "serializedVersion": "2",
-        "x": -546.5,
-        "y": -437.5,
+        "x": -655.0,
+        "y": -1359.0,
         "width": 337.0,
         "height": 176.0
     },

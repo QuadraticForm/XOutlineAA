@@ -53,8 +53,6 @@ Shader "Unlit/XOutlineShader_V3"
                 float4 normalAndAlpha : TEXCOORD1; // better pack stuff into float4 for compatibility with older devices
             };
 
-            float _IsGBufferPass;
-
             CBUFFER_START(UnityPerMaterial)
             fixed4 _Color;
             int _normalFromUvChannel;
@@ -63,8 +61,6 @@ Shader "Unlit/XOutlineShader_V3"
             float _ViewRelative;
             float _MinThicknessInPixels;
             float _CoverageToAlpha;
-            float _BlurRadius;
-            float _LongEdgeBlurRadiusMul;
             CBUFFER_END
 
             float MaxElementVec2(float2 v)
@@ -197,36 +193,31 @@ Shader "Unlit/XOutlineShader_V3"
 
             struct FragmentOutput
             {
-                float4 dest0 : SV_Target0;
-                float4 dest1 : SV_Target1;
+				float4 color : SV_Target0;
+                float4 gbuffer1 : SV_Target1;
+                float4 gbuffer2 : SV_Target2;
             };
 
             FragmentOutput frag (v2f i) : SV_Target
             {
                 FragmentOutput fragOut;
 
-                fragOut.dest0 = 0;
-                fragOut.dest1 = 0;
+				// Color
 
-                // is gbuffer pass
-                if (_IsGBufferPass > 0.5)
-                {
-                    fragOut.dest0.rg = normalize(i.normalAndAlpha.xyz).xy; 
-                    fragOut.dest0.ba = i.original_position_ss.xy;
+				fragOut.color.rgb = _Color.rgb * i.normalAndAlpha.w; // we are using premultiplied alpha method here
+				fragOut.color.a = i.normalAndAlpha.w;
 
-                    // test dest1
+				UNITY_APPLY_FOG(i.fogCoord, fragOut.color);
 
-					fragOut.dest1.rgb = _Color.rgb;
-					fragOut.dest1.a = i.normalAndAlpha.w;
-                }
-                // is shading pass
-                else
-                {
-                    fragOut.dest0.rgb = _Color.rgb * i.normalAndAlpha.w; // we are using premultiplied alpha method here
-                    fragOut.dest0.a = i.normalAndAlpha.w;
+				// GBuffer 1, normal and original (without outline offset) screen space position
 
-                    UNITY_APPLY_FOG(i.fogCoord, fragOut.dest0);
-                }
+				fragOut.gbuffer1.rg = normalize(i.normalAndAlpha.xyz).xy; 
+				fragOut.gbuffer1.ba = i.original_position_ss.xy;
+
+				// GBuffer 2, color and alpha (used for coverage bluring in resolve pass)
+
+				fragOut.gbuffer2.rgb = _Color.rgb;
+				fragOut.gbuffer2.a = i.normalAndAlpha.w;
                         
                 return fragOut;
             }
