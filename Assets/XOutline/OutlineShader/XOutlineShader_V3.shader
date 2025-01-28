@@ -10,6 +10,8 @@ Shader "Unlit/XOutlineShader_V3"
         [ToggleUI]_ViewRelative("ViewRelative", Float) = 0
 
         _MinThicknessInPixels("MinThicknessInPixels", Float) = 0
+
+		// this is useless for now, since we are not doing alpha blending
         [ToggleUI]_CoverageToAlpha("CoverageToAlpha", Float) = 0
 
         _BlurRadius("BlurRadius", Float) = 1
@@ -207,15 +209,9 @@ Shader "Unlit/XOutlineShader_V3"
                 FragmentOutput fragOut;
 
 				// Since we can't set different blending mode for different render target,
-				// and we need alpha blending to achieve "Coverage To Alpha" effect,
-				// we are forced to use premultiplied alpha as the common blending mode (Blend One OneMinusSrcAlpha)
-				// cuz at least it doesn't multiply the alpha value to the color value
-				//
-				// however, it will add background color to the final color,
-				// for the color target this is what we want, but for gbuffers it is not,
-				// 
-				// ¡ù so, we have to render on black background, 
-				// which means we have to render outline first, and Front Normal later.
+				// and any blending other than One One is meaningless for gbuffers,
+				// so we are not doing alpha blending for now, 
+				// sorry CoverageToAlpha, I really wanted to use you
 
 				// Color
 
@@ -233,6 +229,7 @@ Shader "Unlit/XOutlineShader_V3"
 
 				fragOut.gbuffer2.rgb = _Color.rgb;
 				fragOut.gbuffer2.a = i.normalAndAlpha.w;
+				//fragOut.gbuffer2.a = 1;
                         
                 return fragOut;
             }

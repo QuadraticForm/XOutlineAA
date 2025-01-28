@@ -53,6 +53,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	[Header("Resolve Pass")]
 
+	public bool resolveEnabled = true;
+
 	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
 	public float resolveAlpha = 1.0f;
 
@@ -66,8 +68,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	[Header("Debug Pass")]
 
+	public bool debugEnabled = false;
+
 	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
-	public float debugAlpha = 0.0f;
+	public float debugAlpha = 1.0f;
 
 	public Material debugMaterial;
 
@@ -104,8 +108,12 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		renderer.EnqueuePass(preparePass);
 		renderer.EnqueuePass(outlineGBufferPass);
 		renderer.EnqueuePass(frontNormalPass);
-		renderer.EnqueuePass(resolvePass);
-		renderer.EnqueuePass(debugPass);
+
+		if (resolveEnabled && resolveAlpha > 0.0f)
+			renderer.EnqueuePass(resolvePass);
+
+		if (debugEnabled && debugAlpha > 0.0f)
+			renderer.EnqueuePass(debugPass);
 	}
 
 	class XOutlinePreparePass : ScriptableRenderPass

@@ -21,8 +21,10 @@ MonoBehaviour:
   - UniversalGBuffer
   frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
+  resolveEnabled: 1
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  debugEnabled: 1
   debugAlpha: 0
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}
 --- !u!114 &-5067821600128939418
@@ -123,8 +125,10 @@ MonoBehaviour:
   - UniversalForward
   frontNormalMaterial: {fileID: -876546973899608171, guid: d473697068d3f284db99b83821adca9b, type: 3}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
+  resolveEnabled: 1
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  debugEnabled: 0
   debugAlpha: 0
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}
 --- !u!114 &338588822796687199
