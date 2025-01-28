@@ -2087,7 +2087,7 @@
     "m_Title": "GBuffer Normal Search",
     "m_Position": {
         "x": -4234.5,
-        "y": -164.50001525878907
+        "y": -164.5
     }
 }
 
@@ -2601,7 +2601,7 @@
     "m_ObjectId": "662f5cf4da8d4d989e669482829e30e8",
     "m_Title": "Perpendicular Vector",
     "m_Position": {
-        "x": -2180.000244140625,
+        "x": -2180.0,
         "y": 133.0
     }
 }
@@ -3434,7 +3434,7 @@
     "m_ObjectId": "8f5eea4dc400420ea13ff8903fa07576",
     "m_Title": " Scaled View Space Normal, mul by radius",
     "m_Position": {
-        "x": -2824.500244140625,
+        "x": -2824.5,
         "y": 131.5
     }
 }

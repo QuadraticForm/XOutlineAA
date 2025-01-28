@@ -1,0 +1,11 @@
+XOutlineNormalFromUV3 MUST be used with "GenMergedNormal",
+
+which calculates merged normal and store it to specified UV channel.
+
+HOW TO?
+
+on the "Model Importer" GUI, "Model" tab,
+
+ under all original options, there is a "XOutline" section,
+
+check "Gen Merged Normal", and set "UV Channel" to "UV3"

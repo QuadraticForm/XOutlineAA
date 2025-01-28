@@ -2365,7 +2365,7 @@
     "m_ObjectId": "2e739efe99cd4034ab94251128ed5a90",
     "m_Title": "Directional Blur",
     "m_Position": {
-        "x": -1258.000244140625,
+        "x": -1258.0,
         "y": -130.5
     }
 }
@@ -3245,8 +3245,8 @@
     "m_ObjectId": "4ab4a1f8b8b5465eb50d31eda9e75098",
     "m_Title": "GBuffer Search, 9-pixel-block",
     "m_Position": {
-        "x": -6938.50048828125,
-        "y": -295.0001220703125
+        "x": -6938.5,
+        "y": -295.0
     }
 }
 
@@ -4257,7 +4257,7 @@
     "m_ObjectId": "6f7ea46279ac448abafa87c1fca075b5",
     "m_Title": "+Dir and -Dir",
     "m_Position": {
-        "x": -1729.00048828125,
+        "x": -1729.0,
         "y": 199.0
     }
 }
@@ -4799,7 +4799,7 @@
     "m_ObjectId": "82ad532063de4e9ebf598ca172990427",
     "m_Title": "Front Normal Screen Pos",
     "m_Position": {
-        "x": -5332.00048828125,
+        "x": -5332.0,
         "y": 580.0
     }
 }
@@ -5215,8 +5215,8 @@
     "m_ObjectId": "9170837bdb554dda99907a7eed3ff080",
     "m_Title": "Front Normal",
     "m_Position": {
-        "x": -4109.50048828125,
-        "y": 533.4998168945313
+        "x": -4109.5,
+        "y": 533.5
     }
 }
 
@@ -5538,8 +5538,8 @@
     "m_ObjectId": "9804384a1da04cb6af0ee590dfae29a1",
     "m_Title": "Outline Normal",
     "m_Position": {
-        "x": -5356.00048828125,
-        "y": 158.4998779296875
+        "x": -5356.0,
+        "y": 158.5
     }
 }
 
@@ -6116,8 +6116,8 @@
     "m_ObjectId": "a4ebf9aa05e44e4a9dd10ef7274ff0d7",
     "m_Title": "Outline Direction XY",
     "m_Position": {
-        "x": -3423.50048828125,
-        "y": 154.49984741210938
+        "x": -3423.5,
+        "y": 154.5
     }
 }
 
@@ -6271,7 +6271,7 @@
     "m_ObjectId": "aacbe48b49f84e5dbf922096139589be",
     "m_Title": "Move 2 pixels more to ensure that it will sample on front face",
     "m_Position": {
-        "x": -5022.00048828125,
+        "x": -5022.0,
         "y": 387.0
     }
 }
@@ -6925,8 +6925,8 @@
     "m_ObjectId": "c6c9d13e755c46bbae0e70425de13179",
     "m_Title": "mul by radius",
     "m_Position": {
-        "x": -2778.000244140625,
-        "y": 94.99984741210938
+        "x": -2778.0,
+        "y": 95.0
     }
 }
 
@@ -7755,7 +7755,7 @@
     "m_ObjectId": "e8ff9c2bf67b4460b7cbf568fda548f0",
     "m_Title": "Search Result",
     "m_Position": {
-        "x": -5746.50048828125,
+        "x": -5746.5,
         "y": 205.0
     }
 }

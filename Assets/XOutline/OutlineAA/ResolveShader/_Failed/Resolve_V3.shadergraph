@@ -1856,7 +1856,7 @@
     "m_ObjectId": "0631bf6cdec7449abe0b44ddcde50642",
     "m_Title": "Directional Coverage Bur, On GBuffer1, Point Sample",
     "m_Position": {
-        "x": -1250.500244140625,
+        "x": -1250.5,
         "y": 1088.0
     }
 }
@@ -3166,8 +3166,8 @@
     "m_ObjectId": "2e739efe99cd4034ab94251128ed5a90",
     "m_Title": "Directional Blur",
     "m_Position": {
-        "x": -1215.500244140625,
-        "y": -1420.0001220703125
+        "x": -1215.5,
+        "y": -1420.0
     }
 }
 
@@ -4096,8 +4096,8 @@
     "m_ObjectId": "449c019b59b648acb32e3e6795f410cb",
     "m_Title": "Directional Coverage Blur",
     "m_Position": {
-        "x": -1249.500244140625,
-        "y": -120.00003051757813
+        "x": -1249.5,
+        "y": -120.0
     }
 }
 
@@ -6021,7 +6021,7 @@
     "m_ObjectId": "6f7ea46279ac448abafa87c1fca075b5",
     "m_Title": "+Dir and -Dir",
     "m_Position": {
-        "x": -1729.0001220703125,
+        "x": -1729.0,
         "y": 167.5
     }
 }
@@ -8064,7 +8064,7 @@
     "m_ObjectId": "a4ebf9aa05e44e4a9dd10ef7274ff0d7",
     "m_Title": "Outline Direction XY",
     "m_Position": {
-        "x": -3382.500244140625,
+        "x": -3382.5,
         "y": 175.0
     }
 }
@@ -9269,8 +9269,8 @@
     "m_ObjectId": "c6c9d13e755c46bbae0e70425de13179",
     "m_Title": "mul by radius",
     "m_Position": {
-        "x": -2777.000244140625,
-        "y": 94.99996948242188
+        "x": -2777.0,
+        "y": 95.0
     }
 }
 
