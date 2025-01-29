@@ -25,6 +25,7 @@ MonoBehaviour:
   resolveEnabled: 1
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  resolveInjectionPoint: 600
   debugEnabled: 0
   debugAlpha: 1
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}
@@ -121,7 +122,7 @@ MonoBehaviour:
   m_Active: 1
   layerMask:
     serializedVersion: 2
-    m_Bits: 9216
+    m_Bits: 8192
   shaderTagNameList:
   - UniversalForward
   gbufferPrecision: 1
@@ -130,6 +131,7 @@ MonoBehaviour:
   resolveEnabled: 1
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  resolveInjectionPoint: 550
   debugEnabled: 0
   debugAlpha: 0
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}

@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Runtime.Versioning;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
-using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
@@ -60,6 +58,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	#region Resolve Pass Fields
 
+	XOutlinePostProcessPass resolvePass;
+
 	[Header("Resolve Pass")]
 
 	public bool resolveEnabled = true;
@@ -69,7 +69,13 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	public Material resolveMaterial;
 
-	XOutlinePostProcessPass resolvePass;
+	public enum ResolveInjectionPoint
+	{
+		BeforeRenderingPostProcessing = RenderPassEvent.BeforeRenderingPostProcessing,
+		AfterRenderingPostProcessing = RenderPassEvent.AfterRenderingPostProcessing,
+	}
+
+	public ResolveInjectionPoint resolveInjectionPoint = ResolveInjectionPoint.BeforeRenderingPostProcessing;
 
 	#endregion
 
@@ -88,8 +94,16 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	#endregion
 
+	#region Singleton
+
+	public static XOutlineRendererFeature Instance { get; private set; }
+
+	#endregion
+
 	public override void Create()
 	{
+		Instance = this;
+
 		shaderTagIdList = new List<ShaderTagId>();
 		foreach (var passName in shaderTagNameList)
 		{
@@ -100,20 +114,22 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		preparePass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
 		outlineGBufferPass = new XOutlineOutlinePass(this, "XOutline Outline Pass", outlineMaterial);
-		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
-
 		frontNormalPass = new XOutlineFrontNormalPass(this, "XOutline Front Normal Pass", frontNormalMaterial);
-		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
-
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
-		resolvePass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
-
 		debugPass = new XOutlinePostProcessPass(this, debugMaterial, debugAlpha);
-		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
 	}
 
 	public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
 	{
+		// set injection points
+
+		outlineGBufferPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
+		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
+		resolvePass.renderPassEvent = (RenderPassEvent)resolveInjectionPoint;
+		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+
+		// enqueue passes
+
 		renderer.EnqueuePass(preparePass);
 		renderer.EnqueuePass(outlineGBufferPass);
 		renderer.EnqueuePass(frontNormalPass);
