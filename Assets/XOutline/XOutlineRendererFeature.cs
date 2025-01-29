@@ -106,7 +106,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		frontNormalPass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
 		resolvePass = new XOutlinePostProcessPass(this, resolveMaterial, resolveAlpha);
-		resolvePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
+		resolvePass.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
 
 		debugPass = new XOutlinePostProcessPass(this, debugMaterial, debugAlpha);
 		debugPass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;

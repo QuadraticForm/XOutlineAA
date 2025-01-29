@@ -56,7 +56,8 @@ Shader "Unlit/XOutlineShader_V3"
                 float4 vertex : SV_POSITION;
 
                 noperspective float2 original_position_ss : TEXCOORD0;
-                float4 normalAndAlpha : TEXCOORD1; // better pack stuff into float4 for compatibility with older devices
+				noperspective float2 offseted_position_ss : TEXCOORD1;
+                float4 normalAndAlpha : TEXCOORD2; // better pack stuff into float4 for compatibility with older devices
             };
 
             CBUFFER_START(UnityPerMaterial)
@@ -186,8 +187,11 @@ Shader "Unlit/XOutlineShader_V3"
                 o.normalAndAlpha.w = alpha;
 
                 o.original_position_ss = pos_cs_original.xy / pos_cs_original.w * 0.5 + 0.5;
+				o.offseted_position_ss = pos_cs.xy / pos_cs.w * 0.5 + 0.5;
+
                 #if UNITY_UV_STARTS_AT_TOP
                 o.original_position_ss.y = 1 - o.original_position_ss.y; // flip y, this one behaves the same as shader graph
+				o.offseted_position_ss.y = 1 - o.offseted_position_ss.y; // flip y, this one behaves the same as shader graph
                 #endif
 
                 // o.original_position_ss = ComputeScreenPos(pos_cs_original / pos_cs_original.w); // the unity doc is wrong, it told us that this function's input is in clip space, but actually it's NDC(that's clip space / w)
@@ -223,7 +227,7 @@ Shader "Unlit/XOutlineShader_V3"
 				// GBuffer 1, normal and original (without outline offset) screen space position
 
 				fragOut.gbuffer1.rg = normalize(i.normalAndAlpha.xyz).xy; 
-				fragOut.gbuffer1.ba = i.original_position_ss.xy;
+				fragOut.gbuffer1.ba = i.original_position_ss.xy - i.offseted_position_ss.xy; // store delta rather than full pos, helps to reduce precision loss
 
 				// GBuffer 2, color and alpha (used for coverage bluring in resolve pass)
 
