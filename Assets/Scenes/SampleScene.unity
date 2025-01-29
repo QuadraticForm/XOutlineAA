@@ -639,7 +639,7 @@ MonoBehaviour:
   injectionPoint: 550
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
   minBlurDistance: 8
-  maxBlurDistance: 128
+  maxBlurDistance: 32
   urpAaMode: 0
   urpSmaaQuality: 2
   diagonalBlurRadius: 0.1

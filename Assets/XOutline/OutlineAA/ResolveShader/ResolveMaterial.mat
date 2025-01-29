@@ -111,7 +111,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxBlurDistance: 128
+    - _MaxBlurDistance: 32
     - _Metallic: 0
     - _MinBlurDistance: 8
     - _OcclusionStrength: 1

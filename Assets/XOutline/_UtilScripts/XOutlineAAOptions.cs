@@ -40,7 +40,7 @@ public class XOutlineAAOptions : MonoBehaviour
 	[Min(0), Tooltip("In Pixels")]
 	public float minBlurDistance = 8f;
 	[Min(0), Tooltip("In Pixels")]
-	public float maxBlurDistance = 128f;
+	public float maxBlurDistance = 32f;
 
 	[Space]
 	[Header("URP AA")]
