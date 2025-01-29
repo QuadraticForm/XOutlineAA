@@ -631,16 +631,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 239da2bba22d19647829f44f046a0a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enable: 1
-  disableUrpAAWhenEnabled: 0
-  injectionPoint: 600
-  resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
-  diagonalBlurRadius: 0.1
-  flatBlurRadius: 1
-  urpAaMode: 0
-  urpSmaaQuality: 2
   usePresets: 1
   preset: 4
+  rendererFeature: {fileID: -8499227720368284130, guid: f288ae1f4751b564a96ac7587541f7a2, type: 2}
+  enable: 1
+  disableUrpAAWhenEnabled: 0
+  injectionPoint: 550
+  resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  minBlurDistance: 8
+  maxBlurDistance: 128
+  urpAaMode: 0
+  urpSmaaQuality: 2
+  diagonalBlurRadius: 0.1
+  flatBlurRadius: 1
 --- !u!4 &986475917
 Transform:
   m_ObjectHideFlags: 0

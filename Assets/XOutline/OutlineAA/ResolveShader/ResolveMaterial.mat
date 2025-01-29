@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ResolveMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: 89e830aeb587c3245bd10f30bf951d35, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 8d890e673c1c78f47b15979407d35e49, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -107,12 +107,13 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FlatBlurRadius: 15.6
+    - _FlatBlurRadius: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxBlurDistance: 32
+    - _MaxBlurDistance: 128
     - _Metallic: 0
+    - _MinBlurDistance: 8
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0

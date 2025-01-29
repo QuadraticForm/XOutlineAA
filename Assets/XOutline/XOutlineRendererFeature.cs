@@ -94,16 +94,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	#endregion
 
-	#region Singleton
-
-	public static XOutlineRendererFeature Instance { get; private set; }
-
-	#endregion
-
 	public override void Create()
 	{
-		Instance = this;
-
 		shaderTagIdList = new List<ShaderTagId>();
 		foreach (var passName in shaderTagNameList)
 		{

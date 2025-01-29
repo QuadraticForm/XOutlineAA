@@ -4,27 +4,7 @@ using UnityEngine.Rendering.Universal;
 [ExecuteAlways]
 public class XOutlineAAOptions : MonoBehaviour
 {
-	[Header("XOutlineAA")]
-	public bool enable = false;
-	public bool disableUrpAAWhenEnabled = true;
-	public XOutlineRendererFeature.ResolveInjectionPoint injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.BeforeRenderingPostProcessing;
-	[Space]
-	public Material resolveMaterial;
-	[Min(0), Tooltip("In Pixels")]
-	public float maxBlurDistance = 32f;
-
-	[Header("(Deprecated) XOutlineAA V5")]
-	[Min(0)]
-	public float diagonalBlurRadius = 0.1f;
-	[Min(0)]
-	public float flatBlurRadius = 1f;
-
-	[Space]
-	[Header("URP AA")]
-	public AntialiasingMode urpAaMode = AntialiasingMode.None;
-	public AntialiasingQuality urpSmaaQuality = AntialiasingQuality.Low;
-
-	[Space]
+	
 	[Header("Presets")]
 	public bool usePresets = true;
 
@@ -47,6 +27,32 @@ public class XOutlineAAOptions : MonoBehaviour
 	}
 
 	public Preset preset = Preset.XOutlineAA;
+
+	[Space]
+	[Header("XOutlineAA")]
+	public XOutlineRendererFeature rendererFeature = null;
+	[Space]
+	public bool enable = false;
+	public bool disableUrpAAWhenEnabled = true;
+	public XOutlineRendererFeature.ResolveInjectionPoint injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.BeforeRenderingPostProcessing;
+	[Space]
+	public Material resolveMaterial;
+	[Min(0), Tooltip("In Pixels")]
+	public float minBlurDistance = 8f;
+	[Min(0), Tooltip("In Pixels")]
+	public float maxBlurDistance = 128f;
+
+	[Space]
+	[Header("URP AA")]
+	public AntialiasingMode urpAaMode = AntialiasingMode.None;
+	public AntialiasingQuality urpSmaaQuality = AntialiasingQuality.Low;
+
+	[Space]
+	[Header("(Deprecated) XOutlineAA V5")]
+	[Min(0)]
+	public float diagonalBlurRadius = 0.1f;
+	[Min(0)]
+	public float flatBlurRadius = 1f;
 
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -125,7 +131,7 @@ public class XOutlineAAOptions : MonoBehaviour
 
 	void ApplySettings()
 	{
-		if (Camera.main == null || XOutlineRendererFeature.Instance == null)
+		if (Camera.main == null || rendererFeature == null)
 			return;
 
 		var urpCameraSettings = Camera.main.GetUniversalAdditionalCameraData();
@@ -133,8 +139,8 @@ public class XOutlineAAOptions : MonoBehaviour
 		urpCameraSettings.antialiasing = urpAaMode;
 		urpCameraSettings.antialiasingQuality = urpSmaaQuality;
 
-		XOutlineRendererFeature.Instance.resolveEnabled = enable;
-		XOutlineRendererFeature.Instance.resolveInjectionPoint = injectionPoint;
+		rendererFeature.resolveEnabled = enable;
+		rendererFeature.resolveInjectionPoint = injectionPoint;
 
 		if (enable && disableUrpAAWhenEnabled)
 		{
@@ -145,8 +151,13 @@ public class XOutlineAAOptions : MonoBehaviour
 		{
 			// XOutlineAA V6, the blur distance is determined by rasterized line's step length in pixels,
 			// so its always correct regardless of the resolution and line angle.
-			// the only problem is that for points on which the line is completely vertical or horizontal,
-			// the blur distance will be too large, so we need to clamp it.
+			//
+			// but pixels at which the line is completely vertical or horizontal,
+			// the blur distance will be too large.
+			// and pixels at which the line is at 45 degree,
+			// the mathematical blur distance is too small to give a smooth result,
+			// so we need to clamp it.
+			resolveMaterial.SetFloat("_MinBlurDistance", minBlurDistance);
 			resolveMaterial.SetFloat("_MaxBlurDistance", maxBlurDistance);
 
 			// (Deprecated and WRONG)
@@ -156,7 +167,7 @@ public class XOutlineAAOptions : MonoBehaviour
 			resolveMaterial.SetFloat("_DiagonalBlurRadius", diagonalBlurRadius);
 			resolveMaterial.SetFloat("_FlatBlurRadius", flatBlurRadius);
 
-			XOutlineRendererFeature.Instance.resolveMaterial = resolveMaterial;
+			rendererFeature.resolveMaterial = resolveMaterial;
 
 		}
 	}
