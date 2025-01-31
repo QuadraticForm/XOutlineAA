@@ -265,9 +265,14 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
 		{
+			// Render To Camera Color
 			builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
 			builder.SetRenderAttachment(rendererFeature.gbuffer1, 1);
 			builder.SetRenderAttachment(rendererFeature.gbuffer2, 2);
+
+			// Render To GBuffer Only
+			// builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
+			// builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
 
 			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 		}

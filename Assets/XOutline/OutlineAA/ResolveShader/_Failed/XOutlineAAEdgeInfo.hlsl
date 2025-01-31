@@ -72,7 +72,7 @@ void XOutlineAAEdgeInfo_half(
                 left_is_outline ? left_color :
                 right_is_outline ? right_color :
                 down_is_outline ? down_color :
-                up_is_outline ? up_color : half4(0, 0, 0, 0);
+                up_is_outline ? up_color : center_color;
 
     non_outline_color = 
                 !center_is_outline ? center_color :

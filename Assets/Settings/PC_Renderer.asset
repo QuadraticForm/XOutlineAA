@@ -25,7 +25,7 @@ MonoBehaviour:
   resolveEnabled: 1
   resolveAlpha: 1
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
-  resolveInjectionPoint: 600
+  resolveInjectionPoint: 550
   debugEnabled: 0
   debugAlpha: 1
   debugMaterial: {fileID: 2100000, guid: 0c0466c892dc2b64dbb820a6fe77ab53, type: 2}

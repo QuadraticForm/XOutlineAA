@@ -200,13 +200,24 @@ Shader "Unlit/XOutlineShader_V3"
                 return o;
             }
 
-
+			// Render To Camera Color and GBuffers
             struct FragmentOutput
             {
 				float4 color : SV_Target0;
                 float4 gbuffer1 : SV_Target1;
                 float4 gbuffer2 : SV_Target2;
             };
+
+			// Render to gbuffers only
+			/*
+			struct FragmentOutput
+            {
+                float4 gbuffer1 : SV_Target0;
+                float4 gbuffer2 : SV_Target1;
+
+				float4 color : NOUSE;
+            };
+			*/
 
             FragmentOutput frag (v2f i) : SV_Target
             {
@@ -219,8 +230,12 @@ Shader "Unlit/XOutlineShader_V3"
 
 				// Color
 
-				fragOut.color.rgb = _Color.rgb * i.normalAndAlpha.w; // we are using premultiplied alpha method here
-				fragOut.color.a = i.normalAndAlpha.w;
+				// fragOut.color.rgb = _Color.rgb * i.normalAndAlpha.w;		// using premultiplied alpha method here
+				// fragOut.color.a = i.normalAndAlpha.w;
+
+				// not doing alpha blending for now
+				fragOut.color.rgb = _Color.rgb;
+				fragOut.color.a = 1;
 
 				UNITY_APPLY_FOG(i.fogCoord, fragOut.color);
 
@@ -232,8 +247,10 @@ Shader "Unlit/XOutlineShader_V3"
 				// GBuffer 2, color and alpha (used for coverage bluring in resolve pass)
 
 				fragOut.gbuffer2.rgb = _Color.rgb;
-				fragOut.gbuffer2.a = i.normalAndAlpha.w;
-				//fragOut.gbuffer2.a = 1;
+
+				// not doing alpha blending for now
+				//fragOut.gbuffer2.a = i.normalAndAlpha.w;
+				fragOut.gbuffer2.a = 1;
                         
                 return fragOut;
             }
