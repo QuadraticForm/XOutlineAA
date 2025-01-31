@@ -578,7 +578,7 @@
     "m_Group": {
         "m_Id": ""
     },
-    "m_Name": "XAdjPixelOffset4 (Custom Function)",
+    "m_Name": "XAdjPixelOffset8 (Custom Function)",
     "m_DrawState": {
         "m_Expanded": true,
         "m_Position": {
@@ -636,7 +636,7 @@
         "m_SerializableColors": []
     },
     "m_SourceType": 1,
-    "m_FunctionName": "XAdjPixelOffset4",
+    "m_FunctionName": "XAdjPixelOffset8",
     "m_FunctionSource": "",
     "m_FunctionSourceUsePragmas": true,
     "m_FunctionBody": "float p_x = offset_mul.x;\nfloat n_x = -p_x;\n\nfloat p_y = flipY? -offset_mul.y: offset_mul.y;\nfloat n_y = -p_y;\n\n//\n\nleft = float2(n_x, 0);\nright = float2(p_x, 0);\n\ndown = float2(0, n_y);\nup = float2(0, p_y);\n\n//\n\nleft_down = float2(n_x, n_y);\nright_down = float2(p_x, n_y);\n\nleft_up = float2(n_x, p_y);\nright_up = float2(p_x, p_y);\n\n//\n\nleft += center;\nright += center;\ndown += center;\nup += center;\n\nleft_down += center;\nright_down += center;\nleft_up += center;\nright_up += center;\n"

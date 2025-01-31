@@ -5,17 +5,14 @@ Shader "Unlit/XOutlineShader_V3"
         _Color("Color", Color) = (0, 0, 0, 1)
         _normalFromUvChannel("normalFromUvChannel", Int) = 0
 
-        _Thickness("Thickness", Float) = 1
-        _ThicknessSceneUnit("ThicknessSceneUnit", Float) = 0.01
+        _Width("Width", Float) = 1
+        _WidthSceneUnit("WidthSceneUnit", Float) = 0.01
         [ToggleUI]_ViewRelative("ViewRelative", Float) = 0
 
-        _MinThicknessInPixels("MinThicknessInPixels", Float) = 0
+        _MinWidthInPixels("MinWidthInPixels", Float) = 0
 
 		// this is useless for now, since we are not doing alpha blending
         [ToggleUI]_CoverageToAlpha("CoverageToAlpha", Float) = 0
-
-        _BlurRadius("BlurRadius", Float) = 1
-        _LongEdgeBlurRadiusMul("LongEdgeBlurRadiusMul", Float) = 10
     }
     SubShader
     {
@@ -63,10 +60,10 @@ Shader "Unlit/XOutlineShader_V3"
             CBUFFER_START(UnityPerMaterial)
             fixed4 _Color;
             int _normalFromUvChannel;
-            float _Thickness;
-            float _ThicknessSceneUnit;
+            float _Width;
+            float _WidthSceneUnit;
             float _ViewRelative;
-            float _MinThicknessInPixels;
+            float _MinWidthInPixels;
             float _CoverageToAlpha;
             CBUFFER_END
 
@@ -117,7 +114,7 @@ Shader "Unlit/XOutlineShader_V3"
                 float scale_factor = 1;
 
 				//
-				// move pos_cs, to ensure minimum thickness in pixels
+				// move pos_cs, to ensure minimum width in pixels
 				//
 
 				//// pixel offset need to be calculated with NDC pos
@@ -129,7 +126,7 @@ Shader "Unlit/XOutlineShader_V3"
                 float2 offset_in_pixels = offset_ndc * _ScreenParams.xy * 0.5; // ndc is 2 times larger than screen space, so * 0.5
 
 				float major_offset_in_pixels = MaxElementVec2(abs(offset_in_pixels));
-                scale_factor = max(1, _MinThicknessInPixels / major_offset_in_pixels);
+                scale_factor = max(1, _MinWidthInPixels / major_offset_in_pixels);
 
                 pos_ndc = pos_ndc_original + offset_ndc * scale_factor;
 
@@ -151,6 +148,19 @@ Shader "Unlit/XOutlineShader_V3"
 				pos_cs_original.xy = pos_ndc_original.xy * pos_cs_original.w;
             }
 
+			float2 DirToSpherical(float3 dir)
+			{
+				dir = normalize(dir); // Normalize the input direction vector
+    
+				float azi = atan2(dir.y, dir.x); // Compute azimuth angle
+				float alt = atan2(dir.z, length(dir.xy)); // Compute altitude angle
+
+				// azimuth [-pi, pi]
+				// altitude [-pi/2, pi/2]
+
+				return float2(azi, alt);
+			}
+
             v2f vert (appdata v)
             {
                 v2f o;
@@ -158,22 +168,22 @@ Shader "Unlit/XOutlineShader_V3"
                 // transform the vertex to view space
                 float3 pos_vs = mul(UNITY_MATRIX_MV, v.vertex).xyz;
 
-                // calculate thickness
-                float thickness = _ThicknessSceneUnit * _Thickness;
-                thickness *= _ViewRelative > 0.5f ? abs(pos_vs.z) : 1;
+                // calculate width
+                float width = _WidthSceneUnit * _Width;
+                width *= _ViewRelative > 0.5f ? abs(pos_vs.z) : 1;
 
                 // calculate normal
 
                 float3 shading_normal_vs = -normalize(mul((float3x3)UNITY_MATRIX_MV, v.normal)); // flip normal to facing camera since we are rendering back faces
                 float3 offset_normal_vs = CalcOffsetNormalVS(v);
 
-                // offset position by normal and thickness
-                float3 pos_vs_offsetted = pos_vs + offset_normal_vs * thickness;
+                // offset position by normal and width
+                float3 pos_vs_offsetted = pos_vs + offset_normal_vs * width;
 
                 float4 pos_cs_original = mul(UNITY_MATRIX_P, float4(pos_vs, 1));
                 float4 pos_cs = mul(UNITY_MATRIX_P, float4(pos_vs_offsetted, 1));
 
-                // ensure minimum thickness in pixels
+                // ensure minimum width in pixels
 
                 float alpha = 1;
 
@@ -204,20 +214,16 @@ Shader "Unlit/XOutlineShader_V3"
             struct FragmentOutput
             {
 				float4 color : SV_Target0;
+
+				// xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
                 float4 gbuffer1 : SV_Target1;
-                float4 gbuffer2 : SV_Target2;
-            };
 
-			// Render to gbuffers only
-			/*
-			struct FragmentOutput
-            {
-                float4 gbuffer1 : SV_Target0;
-                float4 gbuffer2 : SV_Target1;
-
-				float4 color : NOUSE;
+				// DEPRECATED since resolve shader v6, only kept for testing purpose
+				// Outline Color and Alpha, 
+				// separately stored without blending with camera Color,
+				// for coverage bluring in resolve pass.
+                float4 gbuffer2 : SV_Target2; 
             };
-			*/
 
             FragmentOutput frag (v2f i) : SV_Target
             {
@@ -241,10 +247,11 @@ Shader "Unlit/XOutlineShader_V3"
 
 				// GBuffer 1, normal and original (without outline offset) screen space position
 
-				fragOut.gbuffer1.rg = normalize(i.normalAndAlpha.xyz).xy; 
+				fragOut.gbuffer1.rg = DirToSpherical(normalize(i.normalAndAlpha.xyz)); 
 				fragOut.gbuffer1.ba = i.original_position_ss.xy - i.offseted_position_ss.xy; // store delta rather than full pos, helps to reduce precision loss
 
 				// GBuffer 2, color and alpha (used for coverage bluring in resolve pass)
+				// DEPRECATED since resolve shader v6, only kept for testing purpose
 
 				fragOut.gbuffer2.rgb = _Color.rgb;
 

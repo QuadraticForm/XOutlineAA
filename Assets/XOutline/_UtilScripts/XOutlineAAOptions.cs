@@ -4,11 +4,24 @@ using UnityEngine.Rendering.Universal;
 [ExecuteAlways]
 public class XOutlineAAOptions : MonoBehaviour
 {
-	
-	[Header("Presets")]
-	public bool usePresets = true;
+	[Header("XOutline")]
+	[Space]
+	public XOutlineRendererFeature rendererFeature = null;
 
-	public enum Preset
+	[Space]
+	public Material outlineMaterial;
+
+	[Min(0), Tooltip("Relative to (By Default) 0.01 Scene Unit")]
+	public float width = 1f;
+	public bool widthViewRelative = false;
+	[Min(0)]
+	public float minWidthInPixels = 1f;
+
+	[Space]
+	[Header("AA Presets")]
+	public bool useAAPresets = true;
+
+	public enum AAPreset
 	{
 		None,
 		FXAA,
@@ -26,21 +39,24 @@ public class XOutlineAAOptions : MonoBehaviour
 		XOutlineAA_TAA,
 	}
 
-	public Preset preset = Preset.XOutlineAA;
+	public AAPreset aaPreset = AAPreset.XOutlineAA;
 
 	[Space]
 	[Header("XOutlineAA")]
-	public XOutlineRendererFeature rendererFeature = null;
+	
 	[Space]
 	public bool enable = false;
 	public bool disableUrpAAWhenEnabled = true;
 	public XOutlineRendererFeature.ResolveInjectionPoint injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.BeforeRenderingPostProcessing;
+
 	[Space]
 	public Material resolveMaterial;
 	[Min(0), Tooltip("In Pixels")]
 	public float minBlurDistance = 8f;
 	[Min(0), Tooltip("In Pixels")]
-	public float maxBlurDistance = 32f;
+	public float maxBlurDistance = 128f;
+
+	
 
 	[Space]
 	[Header("URP AA")]
@@ -63,35 +79,35 @@ public class XOutlineAAOptions : MonoBehaviour
 
 	void UpdateSettingsByPreset()
 	{
-		if (!usePresets)
+		if (!useAAPresets)
 			return;
 
-		if (preset == Preset.None)
+		if (aaPreset == AAPreset.None)
 		{
 			enable = false;
 			urpAaMode = AntialiasingMode.None;
 		}
-		else if (preset == Preset.FXAA)
+		else if (aaPreset == AAPreset.FXAA)
 		{
 			enable = false;
 			urpAaMode = AntialiasingMode.FastApproximateAntialiasing;
 		}
-		else if (preset == Preset.SMAA)
+		else if (aaPreset == AAPreset.SMAA)
 		{
 			enable = false;
 			urpAaMode = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
 		}
-		else if (preset == Preset.TAA)
+		else if (aaPreset == AAPreset.TAA)
 		{
 			enable = false;
 			urpAaMode = AntialiasingMode.TemporalAntiAliasing;
 		}
-		else if (preset == Preset.XOutlineAA)
+		else if (aaPreset == AAPreset.XOutlineAA)
 		{
 			enable = true;
 			urpAaMode = AntialiasingMode.None;
 		}
-		else if (preset == Preset.FXAA_XOutlineAA)
+		else if (aaPreset == AAPreset.FXAA_XOutlineAA)
 		{
 			enable = true;
 			disableUrpAAWhenEnabled = false;
@@ -100,7 +116,7 @@ public class XOutlineAAOptions : MonoBehaviour
 			// XOutlineAA after FXAA
 			injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.AfterRenderingPostProcessing;
 		}
-		else if (preset == Preset.XOutlineAA_FXAA)
+		else if (aaPreset == AAPreset.XOutlineAA_FXAA)
 		{
 			enable = true;
 			disableUrpAAWhenEnabled = false;
@@ -109,7 +125,7 @@ public class XOutlineAAOptions : MonoBehaviour
 			// XOutlineAA before FXAA
 			injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.BeforeRenderingPostProcessing;
 		}
-		else if (preset == Preset.SMAA_XOutlineAA)
+		else if (aaPreset == AAPreset.SMAA_XOutlineAA)
 		{
 			enable = true;
 			disableUrpAAWhenEnabled = false;
@@ -118,7 +134,7 @@ public class XOutlineAAOptions : MonoBehaviour
 			// must after SMAA, cuz SMAA doesn't work well with already smooth(blurred) edges
 			injectionPoint = XOutlineRendererFeature.ResolveInjectionPoint.AfterRenderingPostProcessing;
 		}
-		else if (preset == Preset.XOutlineAA_TAA)
+		else if (aaPreset == AAPreset.XOutlineAA_TAA)
 		{
 			enable = true;
 			disableUrpAAWhenEnabled = false;
@@ -133,6 +149,18 @@ public class XOutlineAAOptions : MonoBehaviour
 	{
 		if (Camera.main == null || rendererFeature == null)
 			return;
+
+		// Outline Material Settings
+
+		if (outlineMaterial != null)
+		{
+			outlineMaterial.SetFloat("_Width", width);
+			outlineMaterial.SetFloat("_ViewRelative", widthViewRelative ? 1 : 0);
+			outlineMaterial.SetFloat("_MinWidthInPixels", minWidthInPixels);
+			rendererFeature.outlineMaterial = outlineMaterial;
+		}
+
+		// XOutlineAA Settings
 
 		var urpCameraSettings = Camera.main.GetUniversalAdditionalCameraData();
 
@@ -168,7 +196,6 @@ public class XOutlineAAOptions : MonoBehaviour
 			resolveMaterial.SetFloat("_FlatBlurRadius", flatBlurRadius);
 
 			rendererFeature.resolveMaterial = resolveMaterial;
-
 		}
 	}
 

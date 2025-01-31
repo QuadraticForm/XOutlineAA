@@ -30,8 +30,13 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	[Space]
 	public GBufferPrecision gbufferPrecision = GBufferPrecision.Half;
 
-	// Shared gbuffer texture
+	// xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
 	private TextureHandle gbuffer1 = TextureHandle.nullHandle;
+
+	// DEPRECATED since resolve shader v6, only kept for testing purpose
+	// Outline Color and Alpha, 
+	// separately stored without blending with camera Color,
+	// for coverage bluring in resolve pass.
 	private TextureHandle gbuffer2 = TextureHandle.nullHandle;
 
 	XOutlinePreparePass preparePass;
@@ -161,6 +166,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
 
 				// create gbuffer 2
+				// DEPRECATED since resolve shader v6, only kept for testing purpose
 
 				textureProperties.colorFormat = RenderTextureFormat.ARGB32;
 
@@ -268,11 +274,11 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			// Render To Camera Color
 			builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
 			builder.SetRenderAttachment(rendererFeature.gbuffer1, 1);
-			builder.SetRenderAttachment(rendererFeature.gbuffer2, 2);
+			builder.SetRenderAttachment(rendererFeature.gbuffer2, 2); // DEPRECATED since resolve shader v6, only kept for testing purpose
 
 			// Render To GBuffer Only
 			// builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-			// builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
+			// builder.SetRenderAttachment(rendererFeature.gbuffer2, 1); // DEPRECATED since resolve shader v6, only kept for testing purpose
 
 			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 		}
@@ -300,7 +306,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
 		{
 			builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
+			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1); // DEPRECATED since resolve shader v6, only kept for testing purpose
 			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
 		}
 
@@ -328,7 +334,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 			public TextureHandle cameraColorCopy;
 			public TextureHandle cameraDepth;
 			public TextureHandle gbuffer;
-			public TextureHandle gbuffer2;
+			public TextureHandle gbuffer2; // DEPRECATED since resolve shader v6, only kept for testing purpose
 
 			public TextureHandle destination;
 		}
@@ -388,21 +394,21 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				passData.cameraColorCopy = cameraColorCopy;
 				passData.cameraDepth = resourcesData.cameraDepthTexture;
 				passData.gbuffer = rendererFeature.gbuffer1;
-				passData.gbuffer2 = rendererFeature.gbuffer2;
+				passData.gbuffer2 = rendererFeature.gbuffer2; // DEPRECATED since resolve shader v6, only kept for testing purpose
 				passData.destination = resourcesData.activeColorTexture;
 
 				builder.UseTexture(passData.cameraColorCopy);
 				builder.UseTexture(passData.cameraDepth);
 				builder.UseTexture(passData.gbuffer);
-				builder.UseTexture(passData.gbuffer2);
+				builder.UseTexture(passData.gbuffer2); // DEPRECATED since resolve shader v6, only kept for testing purpose
 				builder.SetRenderAttachment(passData.destination, 0);
 
 				builder.SetRenderFunc((MainPassData data, RasterGraphContext context) =>
 				{
 					propertyBlock.SetTexture("_CameraColorCopy", data.cameraColorCopy);
-					propertyBlock.SetTexture("_CameraDepthCopy", data.cameraDepth); // "_CameraDepthTexture" is in use by unity, so I just use "_CameraDepthCopy" instead
+					// propertyBlock.SetTexture("_CameraDepthCopy", data.cameraDepth); // "_CameraDepthTexture" is in use by unity, so I just use "_CameraDepthCopy" instead
 					propertyBlock.SetTexture("_GBuffer", data.gbuffer);
-					propertyBlock.SetTexture("_GBuffer2", data.gbuffer2);
+					propertyBlock.SetTexture("_GBuffer2", data.gbuffer2); // DEPRECATED since resolve shader v6, only kept for testing purpose
 					propertyBlock.SetFloat("_Alpha", alpha);
 
 					// var material = rendererFeature.debugGBufferAlpha > 0.01f ? rendererFeature.debugMaterial : rendererFeature.resolveMaterial;

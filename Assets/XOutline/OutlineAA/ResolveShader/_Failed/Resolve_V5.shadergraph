@@ -7364,7 +7364,7 @@
     "m_ObjectId": "6f7ea46279ac448abafa87c1fca075b5",
     "m_Title": "+Dir and -Dir",
     "m_Position": {
-        "x": -1514.5001220703125,
+        "x": -1514.5,
         "y": 199.0
     }
 }
@@ -7793,8 +7793,8 @@
     "m_ObjectId": "78076d93fd7b44c8847846cc03610e19",
     "m_Title": "Different Blur Radius For Diagonal Or Flat(mostly horizontal or vertical)",
     "m_Position": {
-        "x": -4033.999755859375,
-        "y": 459.0001220703125
+        "x": -4034.0,
+        "y": 459.0
     }
 }
 
@@ -11716,7 +11716,7 @@
     "m_Title": "mul by radius",
     "m_Position": {
         "x": -2361.0,
-        "y": 243.00010681152345
+        "y": 243.0
     }
 }
 
@@ -12214,7 +12214,7 @@
     "m_Type": "UnityEditor.ShaderGraph.StickyNoteData",
     "m_ObjectId": "d82188d4453f4e1cae6fb274d8564c22",
     "m_Title": "Why This Failed?",
-    "m_Content": "1. Uses arbitrary blur distances, \nonly works well for certain edge direction under certain resolution.\n",
+    "m_Content": "1. Uses arbitrary blur distances, \nonly works well for certain edge direction under certain resolution.\n\n2. Complex and uneffective method of coverage calculation;\n",
     "m_TextSize": 0,
     "m_Theme": 0,
     "m_Position": {
@@ -12331,8 +12331,8 @@
     "m_ObjectId": "de42e609e6844245a1cd69b9da940645",
     "m_Title": "GBuffer Search",
     "m_Position": {
-        "x": -7159.99951171875,
-        "y": -65.99993896484375
+        "x": -7160.0,
+        "y": -66.0
     }
 }
 
@@ -13074,7 +13074,7 @@
     "m_Title": "Directional Blur",
     "m_Position": {
         "x": -1163.5,
-        "y": 1106.4998779296875
+        "y": 1106.5
     }
 }
 

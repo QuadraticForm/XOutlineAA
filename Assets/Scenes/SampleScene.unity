@@ -212,8 +212,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.011053643, y: 0.9775768, z: -0.053147435, w: -0.20346199}
-  m_LocalPosition: {x: 1.1479496, y: 1.3448857, z: 2.2559288}
+  m_LocalRotation: {x: 0.09269799, y: 0.85830086, z: -0.16714329, w: 0.47622463}
+  m_LocalPosition: {x: -4.2709794, y: 2.848463, z: 2.9017262}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -631,15 +631,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 239da2bba22d19647829f44f046a0a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usePresets: 1
-  preset: 4
   rendererFeature: {fileID: -8499227720368284130, guid: f288ae1f4751b564a96ac7587541f7a2, type: 2}
+  outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
+  width: 0.1
+  widthViewRelative: 0
+  minWidthInPixels: 1
+  useAAPresets: 1
+  aaPreset: 4
   enable: 1
   disableUrpAAWhenEnabled: 0
   injectionPoint: 550
   resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
   minBlurDistance: 8
-  maxBlurDistance: 32
+  maxBlurDistance: 128
   urpAaMode: 0
   urpSmaaQuality: 2
   diagonalBlurRadius: 0.1
