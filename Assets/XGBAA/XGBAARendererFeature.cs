@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.RenderGraphModule;
+//using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Experimental.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
@@ -119,7 +120,12 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			this.rendererFeature = rendererFeature;
 		}
 
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /*public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
 		{
 			using (var builder = renderGraph.AddRasterRenderPass<PassData>("XGBAA GBuffer Pass", out var passData))
 			{
@@ -157,9 +163,9 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 
 				builder.SetRenderFunc((PassData data, RasterGraphContext context) => ExecutePass(data, context));
 			}
-		}
+		}*/
 
-		static void ExecutePass(PassData data, RasterGraphContext context)
+		/*static void ExecutePass(PassData data, RasterGraphContext context)
 		{
 			// Clear with 2
 			// gbuffer stores the pixel-edge distance,
@@ -171,7 +177,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			// context.cmd.ClearRenderTarget(false, true, Color.black);
 
 			context.cmd.DrawRendererList(data.rendererListHandle);
-		}
+		}*/
 	}
 
 	class XGBAAPostProcessPass : ScriptableRenderPass
@@ -204,7 +210,11 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 			this.alpha = alpha;
 		}
 
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            throw new System.NotImplementedException();
+        }
+        /*public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
 		{
 			// get all sorts of data from the frame context
 
@@ -265,7 +275,7 @@ public class XGBAARendererFeature : ScriptableRendererFeature
 					context.cmd.DrawProcedural(Matrix4x4.identity, postProcessMaterial, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
 				});
 			}
-		}
+		}*/
 	}
 
 	/*

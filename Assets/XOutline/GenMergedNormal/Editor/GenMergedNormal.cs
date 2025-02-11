@@ -21,7 +21,7 @@ namespace xoutline
 			[NativeDisableParallelForRestriction] internal NativeArray<UnsafeParallelHashMap<Vector3, float3>.ParallelWriter> 
 				outPositionNormalHashMaps;
 
-			void IJobParallelFor.Execute(int vim)
+            void IJobParallelFor.Execute(int vim)
 			{
 				// vim = vertex index in sub-mesh
 				int vit = vim % 3; // vertex index in triangle

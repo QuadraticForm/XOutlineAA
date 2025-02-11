@@ -47,7 +47,8 @@ public class XCamFirstPerson : MonoBehaviour
 	#region Input Actions
 
 	[XHeader("Input Actions")]
-	public string lookActionName = "Look";
+	public InputActionAsset inputActions;
+    public string lookActionName = "Look";
 	public string aimActionName = "Aim";
 	public string exitActionName = "Exit";
 
@@ -84,9 +85,12 @@ public class XCamFirstPerson : MonoBehaviour
 
 	void InitLookActions()
 	{
-		lookAction = InputSystem.actions.FindAction(lookActionName);
-        aimAction = InputSystem.actions.FindAction(aimActionName);
-        exitAction = InputSystem.actions.FindAction(exitActionName);
+		//lookAction = InputSystem.actions.FindAction(lookActionName);
+		//aimAction = InputSystem.actions.FindAction(aimActionName);
+		//exitAction = InputSystem.actions.FindAction(exitActionName);
+		lookAction = inputActions.FindAction(lookActionName);
+        aimAction = inputActions.FindAction(aimActionName);
+        exitAction = inputActions.FindAction(exitActionName);
 
         LogErrorIfActionNotFound(lookAction, lookActionName);
         LogErrorIfActionNotFound(aimAction, aimActionName);

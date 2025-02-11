@@ -43,7 +43,8 @@ namespace x
 
 		[XHeader("Input Actions")]
 
-		public string moveActionName = "Move";
+        public InputActionAsset inputActions;
+        public string moveActionName = "Move";
 		public string sprintActionName = "Sprint";
 
 		private InputAction moveAction;
@@ -82,10 +83,12 @@ namespace x
 
 		void InitMoveActions()
 		{
-			moveAction = InputSystem.actions.FindAction(moveActionName);
-			sprintAction = InputSystem.actions.FindAction(sprintActionName);
+            //moveAction = InputSystem.actions.FindAction(moveActionName);
+            //sprintAction = InputSystem.actions.FindAction(sprintActionName);
+            moveAction = inputActions.FindAction(moveActionName);
+            sprintAction = inputActions.FindAction(sprintActionName);
 
-			LogErrorIfActionNotFound(moveAction, moveActionName);
+            LogErrorIfActionNotFound(moveAction, moveActionName);
 			LogErrorIfActionNotFound(sprintAction, sprintActionName);
 		}
 

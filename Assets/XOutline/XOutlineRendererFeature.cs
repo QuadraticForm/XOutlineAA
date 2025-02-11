@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RendererUtils;
 using UnityEngine.Rendering.Universal;
+using static Unity.VisualScripting.Member;
+using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
@@ -30,16 +34,16 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	[Space]
 	public GBufferPrecision gbufferPrecision = GBufferPrecision.Half;
 
-	// xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
-	private TextureHandle gbuffer1 = TextureHandle.nullHandle;
+    // xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
+	private RenderTargetIdentifier gbuffer1;
 
-	// DEPRECATED since resolve shader v6, only kept for testing purpose
-	// Outline Color and Alpha, 
-	// separately stored without blending with camera Color,
-	// for coverage bluring in resolve pass.
-	private TextureHandle gbuffer2 = TextureHandle.nullHandle;
+    // DEPRECATED since resolve shader v6, only kept for testing purpose
+    // Outline Color and Alpha, 
+    // separately stored without blending with camera Color,
+    // for coverage bluring in resolve pass.
+    private RenderTargetIdentifier gbuffer2;
 
-	XOutlinePreparePass preparePass;
+    XOutlinePreparePass preparePass;
 
 	#endregion
 
@@ -82,11 +86,11 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	public ResolveInjectionPoint resolveInjectionPoint = ResolveInjectionPoint.BeforeRenderingPostProcessing;
 
-	#endregion
+    #endregion
 
-	#region Debug Pass Fields
+    #region Debug Pass Fields
 
-	[Header("Debug Pass")]
+    [Header("Debug Pass")]
 
 	public bool debugEnabled = false;
 
@@ -99,7 +103,7 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
 	#endregion
 
-	public override void Create()
+    public override void Create()
 	{
 		shaderTagIdList = new List<ShaderTagId>();
 		foreach (var passName in shaderTagNameList)
@@ -139,21 +143,31 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	}
 
 	class XOutlinePreparePass : ScriptableRenderPass
-	{ 
+	{
 		protected XOutlineRendererFeature rendererFeature;
+        private const string profilerTag = "PreparePass";
+        private ProfilingSampler prepareSampler = new(profilerTag);
 
-		public XOutlinePreparePass(XOutlineRendererFeature rendererFeature)
+        public XOutlinePreparePass(XOutlineRendererFeature rendererFeature)
 		{
 			this.rendererFeature = rendererFeature;
-		}
+        }
 
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+			ResetTarget();
+			RenderTextureDescriptor desc = renderingData.cameraData.cameraTargetDescriptor;
+			desc.msaaSamples = 1;
+            desc.depthBufferBits = 0;
+        }
+		public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
 		{
-			using (var builder = renderGraph.AddRasterRenderPass<object>("XOutline Prepare GBuffer", out var emptyPassData))
-			{
-				var cameraData = frameContext.Get<UniversalCameraData>();
+			CommandBuffer cmd = CommandBufferPool.Get("XOutline Prepare GBuffer");
 
-				var textureProperties = cameraData.cameraTargetDescriptor;
+			using (new ProfilingScope(cmd, prepareSampler))
+			{
+
+				RenderTextureDescriptor textureProperties = renderingData.cameraData.cameraTargetDescriptor;
 				textureProperties.depthBufferBits = 0;
 
 				// create gbuffer 1
@@ -163,28 +177,27 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				else
 					textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
 
-				rendererFeature.gbuffer1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 1", false);
+				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline GBuffer 1"), textureProperties);
+				rendererFeature.gbuffer1 = new RenderTargetIdentifier("XOutline GBuffer 1");
 
 				// create gbuffer 2
 				// DEPRECATED since resolve shader v6, only kept for testing purpose
 
 				textureProperties.colorFormat = RenderTextureFormat.ARGB32;
+				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline GBuffer 2"), textureProperties);
+				rendererFeature.gbuffer2 = new RenderTargetIdentifier("XOutline GBuffer 2");
 
-				rendererFeature.gbuffer2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, textureProperties, "XOutline GBuffer 2", false);
-
-				// clear them
-
-				builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-				builder.SetRenderAttachment(rendererFeature.gbuffer2, 1);
-
-				builder.SetRenderFunc((object passData, RasterGraphContext context) =>
-				{
-					context.cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
-				});
+                // clear them
+				cmd.SetRenderTarget(rendererFeature.gbuffer1);
+                cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
+                cmd.SetRenderTarget(rendererFeature.gbuffer2);
+                cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
 			}
-		}
-	}
 
+			context.ExecuteCommandBuffer(cmd);
+			CommandBufferPool.Release(cmd);
+        }
+    }
 
 	class XOutlineDrawObjectsPass : ScriptableRenderPass
 	{
@@ -192,107 +205,73 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		protected XOutlineRendererFeature rendererFeature;
 		protected Material overrideMaterial;
 
-		protected UniversalRenderingData renderingData;
-		protected UniversalResourceData resourceData;
-		protected UniversalCameraData cameraData;
-		protected UniversalLightData lightData;
+		protected RenderTargetIdentifier cameraColorTarget;
+		protected RenderTargetIdentifier cameraDepthTarget;
+        protected RendererList rendererList;
 
-		protected RendererListHandle rendererListHandle;
-
-		public static class ShaderPropertyId
-		{
-			public static readonly int IsGBufferPass = Shader.PropertyToID("_IsGBufferPass");
-		}
-
-		public XOutlineDrawObjectsPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
+        public XOutlineDrawObjectsPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
 		{
 			this.name = name;
 			this.rendererFeature = rendererFeature;
 			this.overrideMaterial = overrideMaterial;
-		}
+        }
 
-		protected virtual void CreateRendererList(RenderGraph renderGraph)
+        protected virtual void SetupRenderTargets(CommandBuffer cmd)
+        {
+        }
+
+		public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
 		{
-			var sortFlags = cameraData.defaultOpaqueSortFlags;
-			var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, renderingData, cameraData, lightData, sortFlags);
+			CommandBuffer cmd = CommandBufferPool.Get(name);
 
-			if (overrideMaterial != null)
-			{
-				drawSettings.overrideMaterial = overrideMaterial;
-			}
+            cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+            cameraDepthTarget = renderingData.cameraData.renderer.cameraDepthTargetHandle;
 
-			var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
+            // create renderer list 
 
-			var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
-			rendererListHandle = renderGraph.CreateRendererList(rendererListParameters);
-		}
+            var sortFlags = renderingData.cameraData.defaultOpaqueSortFlags;
+            var drawSettings = RenderingUtils.CreateDrawingSettings(rendererFeature.shaderTagIdList, ref renderingData, sortFlags);
 
-		protected virtual void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
-		{
-		}
+            if (overrideMaterial != null)
+            {
+                drawSettings.overrideMaterial = overrideMaterial;
+            }
 
-		protected virtual void SetRenderFunc(IRasterRenderGraphBuilder builder)
-		{
+            var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
+
+            var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
+            rendererList = context.CreateRendererList(ref rendererListParameters);
+
+            // create render target
+
+            SetupRenderTargets(cmd);
+
+            //context.DrawRenderers(renderingData.cullResults, ref drawSettings, ref filterSettings);
 			
-		}
+			cmd.DrawRendererList(rendererList);
 
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
-		{
-			using (var builder = renderGraph.AddRasterRenderPass<object>(name, out var emptyPassData))
-			{
-				// get all sorts of data from the frame context
-
-				renderingData = frameContext.Get<UniversalRenderingData>();
-				resourceData = frameContext.Get<UniversalResourceData>();
-				cameraData = frameContext.Get<UniversalCameraData>();
-				lightData = frameContext.Get<UniversalLightData>();
-
-				// create renderer list
-
-				CreateRendererList(renderGraph);
-
-				// create render target
-
-				SetupRenderTargets(builder, renderGraph);
-
-				// actual build render graph
-
-				SetRenderFunc(builder);
-			}
-		}
+			context.ExecuteCommandBuffer(cmd);
+			CommandBufferPool.Release(cmd);
+        }
 	}
 
-	class XOutlineOutlinePass : XOutlineDrawObjectsPass
+    class XOutlineOutlinePass : XOutlineDrawObjectsPass
 	{
-		public XOutlineOutlinePass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
+        public XOutlineOutlinePass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
 			: base(rendererFeature, name, overrideMaterial)
 		{
-		}
+        }
 
-		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
+		protected override void SetupRenderTargets(CommandBuffer cmd)
 		{
-			// Render To Camera Color
-			builder.SetRenderAttachment(resourceData.activeColorTexture, 0);
-			builder.SetRenderAttachment(rendererFeature.gbuffer1, 1);
-			builder.SetRenderAttachment(rendererFeature.gbuffer2, 2); // DEPRECATED since resolve shader v6, only kept for testing purpose
-
-			// Render To GBuffer Only
-			// builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-			// builder.SetRenderAttachment(rendererFeature.gbuffer2, 1); // DEPRECATED since resolve shader v6, only kept for testing purpose
-
-			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
-		}
-
-		protected override void SetRenderFunc(IRasterRenderGraphBuilder builder)
-		{
-			builder.UseRendererList(rendererListHandle);
-
-			builder.SetRenderFunc((object passData, RasterGraphContext context) =>
-			{
-				context.cmd.DrawRendererList(rendererListHandle);
-			});
-		}
-	}
+            cmd.SetRenderTarget(
+				new RenderTargetIdentifier[] { 
+					cameraColorTarget, 
+					rendererFeature.gbuffer1, 
+					rendererFeature.gbuffer2 }, 
+				cameraDepthTarget);
+        }
+    }
 
 	// Renders the view space normals of the front faces of objects
 	// this pass can be skipped if the pipeline already has a normal pass
@@ -303,122 +282,73 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		{
 		}
 
-		protected override void SetupRenderTargets(IRasterRenderGraphBuilder builder, RenderGraph renderGraph)
-		{
-			builder.SetRenderAttachment(rendererFeature.gbuffer1, 0);
-			builder.SetRenderAttachment(rendererFeature.gbuffer2, 1); // DEPRECATED since resolve shader v6, only kept for testing purpose
-			builder.SetRenderAttachmentDepth(resourceData.activeDepthTexture);
-		}
-
-		protected override void SetRenderFunc(IRasterRenderGraphBuilder builder)
-		{
-			builder.UseRendererList(rendererListHandle);
-
-			builder.SetRenderFunc((object passData, RasterGraphContext context) =>
-			{
-				context.cmd.DrawRendererList(rendererListHandle);
-			});
-		}
+        protected override void SetupRenderTargets(CommandBuffer cmd)
+        {
+            cmd.SetRenderTarget(
+				new RenderTargetIdentifier[] { 
+					rendererFeature.gbuffer1, 
+					rendererFeature.gbuffer2 }, 
+				cameraDepthTarget);
+        }
 	}
 
 	class XOutlinePostProcessPass : ScriptableRenderPass
 	{
-		private class CopyCameraColorPassData
-		{
-			public TextureHandle source;
-			public TextureHandle destination;
-		}
-
-		private class MainPassData
-		{
-			public TextureHandle cameraColorCopy;
-			public TextureHandle cameraDepth;
-			public TextureHandle gbuffer;
-			public TextureHandle gbuffer2; // DEPRECATED since resolve shader v6, only kept for testing purpose
-
-			public TextureHandle destination;
-		}
-
-		public Material postProcessMaterial;
+        public Material postProcessMaterial;
 		public float alpha = 1;
 		private XOutlineRendererFeature rendererFeature;
-		private MaterialPropertyBlock propertyBlock;
+        private MaterialPropertyBlock propertyBlock;
 
-		public XOutlinePostProcessPass(XOutlineRendererFeature rendererFeature, Material postProcessMaterial, float alpha)
+        public XOutlinePostProcessPass(XOutlineRendererFeature rendererFeature, Material postProcessMaterial, float alpha)
 		{
 			this.rendererFeature = rendererFeature;
-			propertyBlock = new MaterialPropertyBlock();
-			this.postProcessMaterial = postProcessMaterial;
+            propertyBlock = new MaterialPropertyBlock();
+            this.postProcessMaterial = postProcessMaterial;
 			this.alpha = alpha;
 		}
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            if (postProcessMaterial == null || alpha < 0.000001)
+                return;
 
-		public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameContext)
-		{
-			if (postProcessMaterial == null || alpha < 0.000001)
-				return;
+            CommandBuffer cmd = CommandBufferPool.Get("XOutline PostProcess Pass");
 
-			// get all sorts of data from the frame context
+            // get all sorts of data 
 
-			var resourcesData = frameContext.Get<UniversalResourceData>();
-			var cameraData = frameContext.Get<UniversalCameraData>();
+            RTHandle cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+            RTHandle cameraDepthTarget = renderingData.cameraData.renderer.cameraDepthTargetHandle;
 
-			// create a texture to copy current active color texture to
+            // create a texture to copy current active color texture to
 
-			var targetDesc = renderGraph.GetTextureDesc(resourcesData.cameraColor);
-			targetDesc.name = "XOutline Camera Color";
-			targetDesc.clearBuffer = false;
+            var targetDesc = renderingData.cameraData.cameraTargetDescriptor;
+			var targetShaderID = Shader.PropertyToID("XOutline Copy Camera Color");
+            RenderTargetIdentifier cameraColorCopy = new RenderTargetIdentifier(targetShaderID);
+            cmd.GetTemporaryRT(targetShaderID, targetDesc);
 
-			var cameraColorCopy = renderGraph.CreateTexture(targetDesc);
+            // build render graph for copying camera color
 
-			// build render graph for copying camera color
+            cmd.SetRenderTarget(cameraColorCopy);
+            Blitter.BlitTexture(cmd, cameraColorTarget, new Vector4(1, 1, 0, 0), 0.0f, false);
+            //cmd.ClearRenderTarget(true, true, Color.clear);
 
-			using (var builder = renderGraph.AddRasterRenderPass<CopyCameraColorPassData>("XOutline Copy Camera Color", out var passData, profilingSampler))
-			{
-				passData.source = resourcesData.activeColorTexture;
-				passData.destination = cameraColorCopy;
+            // set material properties
 
-				builder.UseTexture(passData.source);
+            cmd.SetGlobalTexture("_CameraColorCopy", cameraColorCopy);
+            cmd.SetGlobalTexture("_GBuffer", rendererFeature.gbuffer1);
+            cmd.SetGlobalTexture("_GBuffer2", rendererFeature.gbuffer2);
+            cmd.SetGlobalFloat("_Alpha", alpha);
 
-				builder.SetRenderAttachment(passData.destination, 0);
 
-				builder.SetRenderFunc((CopyCameraColorPassData data, RasterGraphContext context) =>
-				{
-					Blitter.BlitTexture(context.cmd, data.source, new Vector4(1, 1, 0, 0), 0.0f, false);
-				});
-			}
+            // draw the post process pass
 
-			// build render graph for post process pass
+			cmd.SetRenderTarget(cameraColorTarget, cameraDepthTarget);	
+            cmd.DrawProcedural(Matrix4x4.identity, postProcessMaterial, 0, MeshTopology.Triangles, 3, 1);
+            //cmd.Blit(cameraColorCopy, cameraColorTarget, postProcessMaterial, 0);
 
-			using (var builder = renderGraph.AddRasterRenderPass<MainPassData>("XOutline Post-Process", out var passData, profilingSampler))
-			{
-				passData.cameraColorCopy = cameraColorCopy;
-				passData.cameraDepth = resourcesData.cameraDepthTexture;
-				passData.gbuffer = rendererFeature.gbuffer1;
-				passData.gbuffer2 = rendererFeature.gbuffer2; // DEPRECATED since resolve shader v6, only kept for testing purpose
-				passData.destination = resourcesData.activeColorTexture;
-
-				builder.UseTexture(passData.cameraColorCopy);
-				builder.UseTexture(passData.cameraDepth);
-				builder.UseTexture(passData.gbuffer);
-				builder.UseTexture(passData.gbuffer2); // DEPRECATED since resolve shader v6, only kept for testing purpose
-				builder.SetRenderAttachment(passData.destination, 0);
-
-				builder.SetRenderFunc((MainPassData data, RasterGraphContext context) =>
-				{
-					propertyBlock.SetTexture("_CameraColorCopy", data.cameraColorCopy);
-					// propertyBlock.SetTexture("_CameraDepthCopy", data.cameraDepth); // "_CameraDepthTexture" is in use by unity, so I just use "_CameraDepthCopy" instead
-					propertyBlock.SetTexture("_GBuffer", data.gbuffer);
-					propertyBlock.SetTexture("_GBuffer2", data.gbuffer2); // DEPRECATED since resolve shader v6, only kept for testing purpose
-					propertyBlock.SetFloat("_Alpha", alpha);
-
-					// var material = rendererFeature.debugGBufferAlpha > 0.01f ? rendererFeature.debugMaterial : rendererFeature.resolveMaterial;
-
-					// copied form Unity URP's FullScreenPassRendererFeature.cs
-					// it seems the FullScreen Shader Graph determines the vertex position based on vertex index
-					// and it made this triangle large enough to cover the whole screen
-					context.cmd.DrawProcedural(Matrix4x4.identity, postProcessMaterial, 0, MeshTopology.Triangles, 3, 1, propertyBlock);
-				});
-			}
-		}
-	}
+            // release temporary texture
+            cmd.ReleaseTemporaryRT(targetShaderID);
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
+        }
+    }
 }

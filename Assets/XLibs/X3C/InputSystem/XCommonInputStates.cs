@@ -40,7 +40,8 @@ namespace x
 
 		#region Common Input Actions (Unity Input System)
 
-		private List<InputAction> _allInputActions = new List<InputAction>();
+		private InputActionAsset _inputActions;
+        private List<InputAction> _allInputActions = new List<InputAction>();
 
 		private InputAction moveAction;
 		private InputAction lookAction;
@@ -173,8 +174,9 @@ namespace x
 			Func<string, InputAction> findAndAddAction = 
 				(actionName) =>
 				{
-					var action = InputSystem.actions.FindAction(actionName);
-					_allInputActions.Add(action);
+					//var action = InputSystem.actions.FindAction(actionName);
+                    var action = _inputActions.FindAction(actionName);
+                    _allInputActions.Add(action);
 					return action;
 				};
 
