@@ -248,7 +248,7 @@ MonoBehaviour:
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 1
   m_Antialiasing: 0
-  m_AntialiasingQuality: 2
+  m_AntialiasingQuality: 0
   m_StopNaN: 0
   m_Dithering: 0
   m_ClearDepth: 1
@@ -614,7 +614,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 986475917}
-  - component: {fileID: 986475916}
+  - component: {fileID: 986475918}
   m_Layer: 0
   m_Name: XOutlineAAOptions
   m_TagString: Untagged
@@ -622,35 +622,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &986475916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 986475915}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 239da2bba22d19647829f44f046a0a22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rendererFeature: {fileID: -8499227720368284130, guid: f288ae1f4751b564a96ac7587541f7a2, type: 2}
-  outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
-  width: 0.1
-  widthViewRelative: 0
-  minWidthInPixels: 1
-  useAAPresets: 1
-  aaPreset: 4
-  enable: 1
-  disableUrpAAWhenEnabled: 0
-  injectionPoint: 600
-  resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
-  minBlurDistance: 8
-  maxBlurDistance: 128
-  urpAaMode: 0
-  urpSmaaQuality: 2
-  diagonalBlurRadius: 0.1
-  flatBlurRadius: 1
 --- !u!4 &986475917
 Transform:
   m_ObjectHideFlags: 0
@@ -666,6 +637,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &986475918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 986475915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 239da2bba22d19647829f44f046a0a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rendererFeature: {fileID: -5815219389624332860, guid: 450f2562cccb8d445a72d14007456da9, type: 2}
+  outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
+  width: 0.1
+  widthViewRelative: 0
+  minWidthInPixels: 1
+  useAAPresets: 1
+  aaPreset: 4
+  enable: 1
+  disableUrpAAWhenEnabled: 0
+  injectionPoint: 600
+  resolveMaterial: {fileID: 2100000, guid: 9a8646ea964bf6743a1d9a595b277330, type: 2}
+  minBlurDistance: 8
+  maxBlurDistance: 128
+  urpAaMode: 0
+  urpSmaaQuality: 0
+  diagonalBlurRadius: 0.1
+  flatBlurRadius: 1
 --- !u!1001 &1116238430
 PrefabInstance:
   m_ObjectHideFlags: 0
