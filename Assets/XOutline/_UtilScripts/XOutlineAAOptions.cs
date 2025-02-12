@@ -65,13 +65,6 @@ public class XOutlineAAOptions : MonoBehaviour
 	public AntialiasingMode urpAaMode = AntialiasingMode.None;
 	public AntialiasingQuality urpSmaaQuality = AntialiasingQuality.Low;
 
-	[Space]
-	[Header("(Deprecated) XOutlineAA V5")]
-	[Min(0)]
-	public float diagonalBlurRadius = 0.1f;
-	[Min(0)]
-	public float flatBlurRadius = 1f;
-
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
@@ -195,8 +188,8 @@ public class XOutlineAAOptions : MonoBehaviour
 			// XOutlineAA V5, arbitrary values, not scalable on different resolutions,
 			// which means for different resolutions, the optimal blur radius will be different,
 			// and mathmetically the interpolation between diagonal and flat blur radius should not be linear
-			resolveMaterial.SetFloat("_DiagonalBlurRadius", diagonalBlurRadius);
-			resolveMaterial.SetFloat("_FlatBlurRadius", flatBlurRadius);
+			// resolveMaterial.SetFloat("_DiagonalBlurRadius", diagonalBlurRadius);
+			// resolveMaterial.SetFloat("_FlatBlurRadius", flatBlurRadius);
 
 			rendererFeature.resolveMaterial = resolveMaterial;
 		}

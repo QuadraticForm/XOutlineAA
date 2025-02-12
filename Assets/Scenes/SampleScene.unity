@@ -216,8 +216,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.016737936, y: 0.9549884, z: -0.29103348, w: -0.05492339}
-  m_LocalPosition: {x: 1.0751548, y: 3.9577177, z: 5.0576334}
+  m_LocalRotation: {x: -0.025187958, y: 0.97315395, z: -0.18797417, w: -0.13039455}
+  m_LocalPosition: {x: 1.551568, y: 2.8540547, z: 5.466999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -651,7 +651,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rendererFeature: {fileID: -5815219389624332860, guid: 450f2562cccb8d445a72d14007456da9, type: 2}
   outlineMaterial: {fileID: 2100000, guid: 556dd8efdc3bedd4189d9a35b7395932, type: 2}
-  outlineColor: {r: 0, g: 0, b: 0, a: 0.7490196}
+  outlineColor: {r: 0, g: 0, b: 0, a: 1}
   width: 0.1
   widthViewRelative: 0
   minWidthInPixels: 2
@@ -665,8 +665,6 @@ MonoBehaviour:
   maxBlurDistance: 128
   urpAaMode: 0
   urpSmaaQuality: 2
-  diagonalBlurRadius: 0.1
-  flatBlurRadius: 1
 --- !u!1001 &1116238430
 PrefabInstance:
   m_ObjectHideFlags: 0
