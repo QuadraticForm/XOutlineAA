@@ -270,7 +270,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
     }
 
 	// Renders the view space normals of the front faces of objects
-	// this pass can be skipped if the pipeline already has a normal pass
+	// this pass can be skipped if the pipeline already has a normal pass£¬
+	// or, if opaque pass uses MRT to output normals
 	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
 	{
 		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
