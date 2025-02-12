@@ -11,6 +11,8 @@ public class XOutlineAAOptions : MonoBehaviour
 	[Space]
 	public Material outlineMaterial;
 
+	public Color outlineColor = Color.black;
+
 	[Min(0), Tooltip("Relative to (By Default) 0.01 Scene Unit")]
 	public float width = 1f;
 	public bool widthViewRelative = false;
@@ -154,6 +156,7 @@ public class XOutlineAAOptions : MonoBehaviour
 
 		if (outlineMaterial != null)
 		{
+			outlineMaterial.SetColor("_Color", outlineColor);
 			outlineMaterial.SetFloat("_Width", width);
 			outlineMaterial.SetFloat("_ViewRelative", widthViewRelative ? 1 : 0);
 			outlineMaterial.SetFloat("_MinWidthInPixels", minWidthInPixels);

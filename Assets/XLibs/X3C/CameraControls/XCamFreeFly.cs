@@ -81,6 +81,11 @@ namespace x
 			lookCam = GetComponent<XCamFirstPerson>();
 		}
 
+		private void OnEnable()
+		{
+			inputActions.Enable();
+		}
+
 		void InitMoveActions()
 		{
             //moveAction = InputSystem.actions.FindAction(moveActionName);

@@ -30,20 +30,16 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 	[Space]
 	public GBufferPrecision gbufferPrecision = GBufferPrecision.Half;
 
-    // xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
-	private RenderTargetIdentifier gbuffer1;
-
-    // DEPRECATED since resolve shader v6, only kept for testing purpose
-    // Outline Color and Alpha, 
-    // separately stored without blending with camera Color,
-    // for coverage bluring in resolve pass.
-    private RenderTargetIdentifier gbuffer2;
+    // xy: normal in spherical coordinates
+	private RenderTargetIdentifier frontNormalBuffer;
+	// xy: edge direction in spherical coordinates
+	private RenderTargetIdentifier edgeDirectionBuffer;
 
     XOutlinePreparePass preparePass;
 
 	#endregion
 
-	#region Front Normal Pass
+	#region Front Normal Pass Fields
 
 	[Header("Normal Pass")]
 	public Material frontNormalMaterial;
@@ -86,8 +82,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
     #region Debug Pass Fields
 
-    [Header("Debug Pass")]
-
+    [Header("(DEPRECATED) Debug Pass")]
+	[Tooltip("GBuffer now is simple enough to be viewed directly in FrameDebugger, special shaders are not required anymore")]
 	public bool debugEnabled = false;
 
 	[Range(0, 1), Tooltip("If alpha == 0, won't execute this pass")]
@@ -128,8 +124,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		// enqueue passes
 
 		renderer.EnqueuePass(preparePass);
-		renderer.EnqueuePass(outlineGBufferPass);
+
 		renderer.EnqueuePass(frontNormalPass);
+
+		renderer.EnqueuePass(outlineGBufferPass);
 
 		if (resolveEnabled && resolveAlpha > 0.0f)
 			renderer.EnqueuePass(resolvePass);
@@ -137,6 +135,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 		if (debugEnabled && debugAlpha > 0.0f)
 			renderer.EnqueuePass(debugPass);
 	}
+
+	#region Pass Classes
 
 	class XOutlinePreparePass : ScriptableRenderPass
 	{
@@ -169,24 +169,20 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 				// create gbuffer 1
 
 				if (rendererFeature.gbufferPrecision == GBufferPrecision.Half)
-					textureProperties.colorFormat = RenderTextureFormat.ARGBHalf;
+					textureProperties.colorFormat = RenderTextureFormat.RGHalf;
 				else
-					textureProperties.colorFormat = RenderTextureFormat.ARGBFloat;
+					textureProperties.colorFormat = RenderTextureFormat.RGFloat;
 
-				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline GBuffer 1"), textureProperties);
-				rendererFeature.gbuffer1 = new RenderTargetIdentifier("XOutline GBuffer 1");
+				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline Front Normal Buffer"), textureProperties);
+				rendererFeature.frontNormalBuffer = new RenderTargetIdentifier("XOutline Front Normal Buffer");
 
-				// create gbuffer 2
-				// DEPRECATED since resolve shader v6, only kept for testing purpose
+				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline Edge Direction Buffer"), textureProperties);
+				rendererFeature.edgeDirectionBuffer = new RenderTargetIdentifier("XOutline Edge Direction Buffer");
 
-				textureProperties.colorFormat = RenderTextureFormat.ARGB32;
-				cmd.GetTemporaryRT(Shader.PropertyToID("XOutline GBuffer 2"), textureProperties);
-				rendererFeature.gbuffer2 = new RenderTargetIdentifier("XOutline GBuffer 2");
-
-                // clear them
-				cmd.SetRenderTarget(rendererFeature.gbuffer1);
+				// clear them
+				cmd.SetRenderTarget(rendererFeature.frontNormalBuffer);
                 cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
-                cmd.SetRenderTarget(rendererFeature.gbuffer2);
+                cmd.SetRenderTarget(rendererFeature.edgeDirectionBuffer);
                 cmd.ClearRenderTarget(false, true, new Color(0, 0, 0, 0));
 			}
 
@@ -216,6 +212,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
         {
         }
 
+		protected virtual void SetupGlobalProperties(CommandBuffer cmd)
+		{
+		}
+
 		public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
 		{
 			CommandBuffer cmd = CommandBufferPool.Get(name);
@@ -233,21 +233,38 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
                 drawSettings.overrideMaterial = overrideMaterial;
             }
 
-            var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
+			var filterSettings = new FilteringSettings(RenderQueueRange.all, rendererFeature.layerMask);
 
             var rendererListParameters = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
             rendererList = context.CreateRendererList(ref rendererListParameters);
 
-            // create render target
+			SetupGlobalProperties(cmd);
 
             SetupRenderTargets(cmd);
-
-            //context.DrawRenderers(renderingData.cullResults, ref drawSettings, ref filterSettings);
 			
 			cmd.DrawRendererList(rendererList);
 
 			context.ExecuteCommandBuffer(cmd);
 			CommandBufferPool.Release(cmd);
+        }
+	}
+
+	// Render the view space normals of the front faces of objects
+	// this pass can be skipped if the pipeline already has a normal pass£¬
+	// or, if opaque pass uses MRT to output normals
+	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
+	{
+		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
+			: base(rendererFeature, name, overrideMaterial)
+		{
+		}
+
+        protected override void SetupRenderTargets(CommandBuffer cmd)
+        {
+            cmd.SetRenderTarget(
+				new RenderTargetIdentifier[] { 
+					rendererFeature.frontNormalBuffer}, 
+				cameraDepthTarget);
         }
 	}
 
@@ -263,30 +280,14 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
             cmd.SetRenderTarget(
 				new RenderTargetIdentifier[] { 
 					cameraColorTarget, 
-					rendererFeature.gbuffer1, 
-					rendererFeature.gbuffer2 }, 
+					rendererFeature.edgeDirectionBuffer}, 
 				cameraDepthTarget);
         }
-    }
 
-	// Renders the view space normals of the front faces of objects
-	// this pass can be skipped if the pipeline already has a normal pass£¬
-	// or, if opaque pass uses MRT to output normals
-	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
-	{
-		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
-			: base(rendererFeature, name, overrideMaterial)
+		protected override void SetupGlobalProperties(CommandBuffer cmd)
 		{
+			cmd.SetGlobalTexture("_FrontNormalBuffer", rendererFeature.frontNormalBuffer);
 		}
-
-        protected override void SetupRenderTargets(CommandBuffer cmd)
-        {
-            cmd.SetRenderTarget(
-				new RenderTargetIdentifier[] { 
-					rendererFeature.gbuffer1, 
-					rendererFeature.gbuffer2 }, 
-				cameraDepthTarget);
-        }
 	}
 
 	class XOutlinePostProcessPass : ScriptableRenderPass
@@ -320,25 +321,20 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
             RenderTargetIdentifier cameraColorCopy = new RenderTargetIdentifier(targetShaderID);
             cmd.GetTemporaryRT(targetShaderID, targetDesc);
 
-            // build render graph for copying camera color
+			// copy current camera color, is this necessary, does unity already have a copy of the camera color?
 
-            //cmd.SetRenderTarget(cameraColorCopy);
-            //Blitter.BlitTexture(cmd, cameraColorTarget, new Vector4(1, 1, 0, 0), 0.0f, false);
 			cmd.Blit(cameraColorTarget, cameraColorCopy);
 
 			// set material properties
 
 			cmd.SetGlobalTexture("_CameraColorCopy", cameraColorCopy);
-            cmd.SetGlobalTexture("_GBuffer", rendererFeature.gbuffer1);
-            cmd.SetGlobalTexture("_GBuffer2", rendererFeature.gbuffer2);
-            cmd.SetGlobalFloat("_Alpha", alpha);
-
+			cmd.SetGlobalTexture("_GBuffer", rendererFeature.edgeDirectionBuffer);
+			cmd.SetGlobalFloat("_Alpha", alpha);
 
             // draw the post process pass
 
 			cmd.SetRenderTarget(cameraColorTarget, cameraDepthTarget);	
             cmd.DrawProcedural(Matrix4x4.identity, postProcessMaterial, 0, MeshTopology.Triangles, 3, 1);
-            //cmd.Blit(cameraColorCopy, cameraColorTarget, postProcessMaterial, 0);
 
             // release temporary texture
             cmd.ReleaseTemporaryRT(targetShaderID);
@@ -346,4 +342,6 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
             CommandBufferPool.Release(cmd);
         }
     }
+
+	#endregion
 }

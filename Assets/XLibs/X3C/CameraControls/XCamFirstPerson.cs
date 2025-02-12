@@ -83,6 +83,11 @@ public class XCamFirstPerson : MonoBehaviour
         UpdateCursorState();
     }
 
+	private void OnEnable()
+	{
+		inputActions.Enable();
+	}
+
 	void InitLookActions()
 	{
 		//lookAction = InputSystem.actions.FindAction(lookActionName);

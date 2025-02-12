@@ -11,16 +11,12 @@ Shader "Unlit/XOutlineShader_V3"
 
         _MinWidthInPixels("MinWidthInPixels", Float) = 0
 
-		// this is useless for now, since we are not doing alpha blending
         [ToggleUI]_CoverageToAlpha("CoverageToAlpha", Float) = 0
     }
     SubShader
     {
-        // Tags { "RenderType"="Transparent" }
-        // Blend One OneMinusSrcAlpha
-
-        Tags { "RenderType"="Opaque" }
-        // Blend One OneMinusSrcAlpha
+        Tags { "RenderType"="Transparent" }
+        Blend One OneMinusSrcAlpha
 
         LOD 100
 
@@ -53,7 +49,7 @@ Shader "Unlit/XOutlineShader_V3"
                 float4 vertex : SV_POSITION;
 
                 noperspective float2 original_position_ss : TEXCOORD0;
-				noperspective float2 offseted_position_ss : TEXCOORD1;
+				// noperspective float2 offseted_position_ss : TEXCOORD1;
                 float4 normalAndAlpha : TEXCOORD2; // better pack stuff into float4 for compatibility with older devices
             };
 
@@ -66,6 +62,11 @@ Shader "Unlit/XOutlineShader_V3"
             float _MinWidthInPixels;
             float _CoverageToAlpha;
             CBUFFER_END
+
+			Texture2D _FrontNormalBuffer;
+            // Declare the sampler state
+            SamplerState sampler_FrontNormalBuffer;
+
 
             float MaxElementVec2(float2 v)
             {
@@ -138,8 +139,8 @@ Shader "Unlit/XOutlineShader_V3"
 
                 alpha = _CoverageToAlpha > 0.5f ? 1 / scale_factor : 1;
 
-				// move "original" inward 1 pixel, so in resolve pass, with original_position_ss, 
-				// we are garrenteed to sample the "Front Normal", instead of the "Outline Normal"
+				// move "original" inward 1 pixel, so that with original_position_ss, 
+				// we are garrenteed to sample the "Front Normal"
 
 				scale_factor = -1 / major_offset_in_pixels;
 
@@ -161,6 +162,20 @@ Shader "Unlit/XOutlineShader_V3"
 				return float2(azi, alt);
 			}
 
+            float3 SphericalToDir(float2 spherical)
+            {
+                float azi = spherical.x;
+                float alt = spherical.y;
+
+                float cosAlt = cos(alt);
+                float3 dir;
+                dir.x = cosAlt * cos(azi);
+                dir.y = cosAlt * sin(azi);
+                dir.z = sin(alt);
+
+                return normalize(dir);
+            }
+
             v2f vert (appdata v)
             {
                 v2f o;
@@ -174,7 +189,7 @@ Shader "Unlit/XOutlineShader_V3"
 
                 // calculate normal
 
-                float3 shading_normal_vs = -normalize(mul((float3x3)UNITY_MATRIX_MV, v.normal)); // flip normal to facing camera since we are rendering back faces
+                float3 shading_normal_vs = normalize(mul((float3x3)UNITY_MATRIX_MV, v.normal));
                 float3 offset_normal_vs = CalcOffsetNormalVS(v);
 
                 // offset position by normal and width
@@ -197,11 +212,11 @@ Shader "Unlit/XOutlineShader_V3"
                 o.normalAndAlpha.w = alpha;
 
                 o.original_position_ss = pos_cs_original.xy / pos_cs_original.w * 0.5 + 0.5;
-				o.offseted_position_ss = pos_cs.xy / pos_cs.w * 0.5 + 0.5;
+				// o.offseted_position_ss = pos_cs.xy / pos_cs.w * 0.5 + 0.5;
 
                 #if UNITY_UV_STARTS_AT_TOP
                 o.original_position_ss.y = 1 - o.original_position_ss.y; // flip y, this one behaves the same as shader graph
-				o.offseted_position_ss.y = 1 - o.offseted_position_ss.y; // flip y, this one behaves the same as shader graph
+				// o.offseted_position_ss.y = 1 - o.offseted_position_ss.y; // flip y, this one behaves the same as shader graph
                 #endif
 
                 // o.original_position_ss = ComputeScreenPos(pos_cs_original / pos_cs_original.w); // the unity doc is wrong, it told us that this function's input is in clip space, but actually it's NDC(that's clip space / w)
@@ -216,48 +231,30 @@ Shader "Unlit/XOutlineShader_V3"
 				float4 color : SV_Target0;
 
 				// xy: normal in spherical coordinates, zw: delta screen space position between offseted and original
-                float4 gbuffer1 : SV_Target1;
-
-				// DEPRECATED since resolve shader v6, only kept for testing purpose
-				// Outline Color and Alpha, 
-				// separately stored without blending with camera Color,
-				// for coverage bluring in resolve pass.
-                float4 gbuffer2 : SV_Target2; 
+                float2 edgeDirection : SV_Target1;
             };
 
             FragmentOutput frag (v2f i) : SV_Target
             {
                 FragmentOutput fragOut;
 
-				// Since we can't set different blending mode for different render target,
-				// and any blending other than One One is meaningless for gbuffers,
-				// so we are not doing alpha blending for now, 
-				// sorry CoverageToAlpha, I really wanted to use you
-
 				// Color
 
-				// fragOut.color.rgb = _Color.rgb * i.normalAndAlpha.w;		// using premultiplied alpha method here
-				// fragOut.color.a = i.normalAndAlpha.w;
+				fragOut.color.a = _Color.a * i.normalAndAlpha.w;
 
-				// not doing alpha blending for now
-				fragOut.color.rgb = _Color.rgb;
-				fragOut.color.a = 1;
+                fragOut.color.rgb = _Color.rgb * fragOut.color.a; // we are using Blend One OneMinusSrcAlpha, so we need to multiply alpha here
 
 				UNITY_APPLY_FOG(i.fogCoord, fragOut.color);
 
-				// GBuffer 1, normal and original (without outline offset) screen space position
+                // Edge Direction
 
-				fragOut.gbuffer1.rg = DirToSpherical(normalize(i.normalAndAlpha.xyz)); 
-				fragOut.gbuffer1.ba = i.original_position_ss.xy - i.offseted_position_ss.xy; // store delta rather than full pos, helps to reduce precision loss
+                float2 frontNormalSph = _FrontNormalBuffer.Sample(sampler_FrontNormalBuffer, i.original_position_ss.xy).xy;
+                
+                float3 frontNormal = SphericalToDir(frontNormalSph);
 
-				// GBuffer 2, color and alpha (used for coverage bluring in resolve pass)
-				// DEPRECATED since resolve shader v6, only kept for testing purpose
+                float3 edgeDirection = normalize(cross(frontNormal, normalize(i.normalAndAlpha.xyz)));
 
-				fragOut.gbuffer2.rgb = _Color.rgb;
-
-				// not doing alpha blending for now
-				//fragOut.gbuffer2.a = i.normalAndAlpha.w;
-				fragOut.gbuffer2.a = 1;
+                fragOut.edgeDirection.rg = DirToSpherical(edgeDirection);
                         
                 return fragOut;
             }
