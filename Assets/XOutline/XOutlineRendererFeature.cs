@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.RendererUtils;
 using UnityEngine.Rendering.Universal;
-using static Unity.VisualScripting.Member;
-using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
@@ -274,7 +270,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
     }
 
 	// Renders the view space normals of the front faces of objects
-	// this pass can be skipped if the pipeline already has a normal pass
+	// this pass can be skipped if the pipeline already has a normal pass£¬
+	// or, if opaque pass uses MRT to output normals
 	class XOutlineFrontNormalPass : XOutlineDrawObjectsPass
 	{
 		public XOutlineFrontNormalPass(XOutlineRendererFeature rendererFeature, string name, Material overrideMaterial = null)
