@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.RendererUtils;
 using UnityEngine.Rendering.Universal;
-using static Unity.VisualScripting.Member;
-using static UnityEngine.Rendering.Universal.ShaderInput;
 
 public class XOutlineRendererFeature : ScriptableRendererFeature
 {
@@ -297,12 +293,10 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
         public Material postProcessMaterial;
 		public float alpha = 1;
 		private XOutlineRendererFeature rendererFeature;
-        private MaterialPropertyBlock propertyBlock;
 
         public XOutlinePostProcessPass(XOutlineRendererFeature rendererFeature, Material postProcessMaterial, float alpha)
 		{
 			this.rendererFeature = rendererFeature;
-            propertyBlock = new MaterialPropertyBlock();
             this.postProcessMaterial = postProcessMaterial;
 			this.alpha = alpha;
 		}
@@ -315,8 +309,8 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
             // get all sorts of data 
 
-            RTHandle cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
-            RTHandle cameraDepthTarget = renderingData.cameraData.renderer.cameraDepthTargetHandle;
+            RenderTargetIdentifier cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+            RenderTargetIdentifier cameraDepthTarget = renderingData.cameraData.renderer.cameraDepthTargetHandle;
 
             // create a texture to copy current active color texture to
 
@@ -327,13 +321,13 @@ public class XOutlineRendererFeature : ScriptableRendererFeature
 
             // build render graph for copying camera color
 
-            cmd.SetRenderTarget(cameraColorCopy);
-            Blitter.BlitTexture(cmd, cameraColorTarget, new Vector4(1, 1, 0, 0), 0.0f, false);
-            //cmd.ClearRenderTarget(true, true, Color.clear);
+            //cmd.SetRenderTarget(cameraColorCopy);
+            //Blitter.BlitTexture(cmd, cameraColorTarget, new Vector4(1, 1, 0, 0), 0.0f, false);
+			cmd.Blit(cameraColorTarget, cameraColorCopy);
 
-            // set material properties
+			// set material properties
 
-            cmd.SetGlobalTexture("_CameraColorCopy", cameraColorCopy);
+			cmd.SetGlobalTexture("_CameraColorCopy", cameraColorCopy);
             cmd.SetGlobalTexture("_GBuffer", rendererFeature.gbuffer1);
             cmd.SetGlobalTexture("_GBuffer2", rendererFeature.gbuffer2);
             cmd.SetGlobalFloat("_Alpha", alpha);
